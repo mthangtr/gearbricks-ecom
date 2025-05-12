@@ -12,11 +12,16 @@ async function getBaseUrl() {
     return `${protocol}://${host}`;
 }
 
-async function fetchProducts(category: string | null, page: number) {
+async function fetchProducts(category: string | null, search: string | null, page: number) {
     const baseUrl = await getBaseUrl();
     const url = new URL(`${baseUrl}/api/products/category`);
     url.searchParams.set("page", page.toString());
-    if (category) url.searchParams.set("category", category);
+
+    if (search) {
+        url.searchParams.set("search", search);
+    } else if (category) {
+        url.searchParams.set("category", category);
+    }
 
     const res = await fetch(url.toString(), { cache: "no-store" });
 
@@ -28,16 +33,17 @@ async function fetchProducts(category: string | null, page: number) {
 export default async function CategoryPage({
     searchParams,
 }: {
-    searchParams: { category?: string; page?: string };
+    searchParams: { category?: string; search?: string; page?: string; };
 }) {
-    const { page: rawPage, category: rawCategory } = await searchParams;
+    const { page: rawPage, category: rawCategory, search: rawSearch } = await searchParams;
 
     const page = parseInt(rawPage || "1", 10);
     const category = rawCategory || "all";
+    const search = rawSearch || null;
 
     let data;
     try {
-        data = await fetchProducts(category, page);
+        data = await fetchProducts(category, search, page);
     } catch {
         return notFound();
     }
@@ -61,7 +67,14 @@ export default async function CategoryPage({
 
     return (
         <div>
-            <h1 className="text-2xl font-bold mb-6">Sản phẩm {category ? `: ${handleCategoryDisplay(category)}` : ""}</h1>
+            <h1 className="text-2xl font-bold mb-6">
+                Sản phẩm
+                {search
+                    ? `: Tìm kiếm với từ khóa "${search}"`
+                    : category
+                        ? `: ${handleCategoryDisplay(category)}`
+                        : ""}
+            </h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-10">
                 {products.length > 0 ? (
@@ -76,28 +89,50 @@ export default async function CategoryPage({
             {/* Pagination */}
             <Pagination>
                 <PaginationContent>
+                    {/* Previous */}
                     {pagination.page > 1 && (
                         <PaginationItem>
-                            <PaginationPrevious href={`?category=${category || ""}&page=${pagination.page - 1}`} />
+                            <PaginationPrevious
+                                href={
+                                    search
+                                        ? `?search=${encodeURIComponent(search)}&page=${pagination.page - 1}`
+                                        : `?category=${encodeURIComponent(category)}&page=${pagination.page - 1}`
+                                }
+                            />
                         </PaginationItem>
                     )}
+
+                    {/* Page numbers */}
                     {Array.from({ length: pagination.totalPages }, (_, i) => (
                         <PaginationItem key={i}>
                             <PaginationLink
-                                href={`?category=${category || ""}&page=${i + 1}`}
+                                href={
+                                    search
+                                        ? `?search=${encodeURIComponent(search)}&page=${i + 1}`
+                                        : `?category=${encodeURIComponent(category)}&page=${i + 1}`
+                                }
                                 isActive={pagination.page === i + 1}
                             >
                                 {i + 1}
                             </PaginationLink>
                         </PaginationItem>
                     ))}
+
+                    {/* Next */}
                     {pagination.page < pagination.totalPages && (
                         <PaginationItem>
-                            <PaginationNext href={`?category=${category || ""}&page=${pagination.page + 1}`} />
+                            <PaginationNext
+                                href={
+                                    search
+                                        ? `?search=${encodeURIComponent(search)}&page=${pagination.page + 1}`
+                                        : `?category=${encodeURIComponent(category)}&page=${pagination.page + 1}`
+                                }
+                            />
                         </PaginationItem>
                     )}
                 </PaginationContent>
             </Pagination>
+
         </div>
     );
 }

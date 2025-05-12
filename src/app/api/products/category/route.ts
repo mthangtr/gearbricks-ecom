@@ -10,11 +10,20 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const rawCategory = searchParams.get("category");
     const category = !rawCategory || rawCategory === "all" ? null : rawCategory;
+    const search = searchParams.get("search");
 
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = 20;
 
-    const filter: any = category ? { category } : {};
+    const filter: any = {};
+
+    if (category) {
+      filter.category = category;
+    }
+
+    if (search) {
+      filter.name = { $regex: search, $options: "i" };
+    }
 
     const products = await Product.find(filter)
       .sort({ createdAt: -1 })

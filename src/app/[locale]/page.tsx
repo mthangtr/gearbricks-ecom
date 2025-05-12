@@ -5,7 +5,7 @@ import BestSellerProductsSection from "@/components/homepage/BestSellerProductsS
 
 export default async function HomePageServer() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/latest`, {
-        cache: "no-cache",
+        cache: "no-store",
     });
 
     if (!res.ok) {

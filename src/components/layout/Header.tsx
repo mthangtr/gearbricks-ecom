@@ -1,5 +1,4 @@
 import React from "react";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import {
     NavigationMenu,
@@ -7,10 +6,8 @@ import {
     NavigationMenuItem,
     NavigationMenuLink,
     navigationMenuTriggerStyle,
-    NavigationMenuTrigger,
-    NavigationMenuContent,
 } from "@/components/ui/navigation-menu";
-import { User, ShoppingCart, Search, AlignJustify } from "lucide-react";
+import { User, ShoppingCart, AlignJustify } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
@@ -21,6 +18,7 @@ import {
     DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import CategoryDropdown from "./CategoryDropdown";
+import SearchInput from "../SearchInput";
 
 export default function Header() {
     return (
@@ -37,7 +35,7 @@ export default function Header() {
                         <NavigationMenuList className="flex items-center gap-4">
                             <NavigationMenuItem>
                                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                    <Link href="/category/all">Newest</Link>
+                                    <Link href="/category?category=all">Newest</Link>
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
@@ -52,7 +50,7 @@ export default function Header() {
                                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                                     <Link href="/mystery-box" className="relative inline-block">
                                         Mystery box
-                                        <span className="absolute -top-3 -right-2 text-[10px] font-semibold text-white bg-red-500 px-1.5 py-0.5 rounded-full animate-pulse shadow">
+                                        <span className="absolute -top-2 -right-2 text-[10px] font-semibold text-white bg-red-500 px-1.5 py-0.5 rounded-full animate-pulse shadow">
                                             250k
                                         </span>
                                     </Link>
@@ -64,11 +62,7 @@ export default function Header() {
 
                 {/* Search + Icon + LocaleSwitcher (desktop) */}
                 <div className="hidden lg:flex items-center gap-2">
-                    <Input
-                        type="text"
-                        placeholder="Search..."
-                        className="w-64 h-10 pr-4 rounded-full border focus:outline-none focus:ring-2"
-                    />
+                    <SearchInput />
                     <Link href="/cart">
                         <Button className="cursor-pointer" variant="ghost" size="icon">
                             <ShoppingCart />
