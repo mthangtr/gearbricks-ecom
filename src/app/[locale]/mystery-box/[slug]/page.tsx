@@ -6,7 +6,7 @@ import Image from 'next/image';
 import clsx from 'clsx';
 import { Gift, PartyPopper } from 'lucide-react';
 import SpinBox from '@/components/SpinBox';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import QuantityCounter from '@/components/QuantityCounter';
 
 const blindBoxTypes = [
     { id: 'hypercar', label: 'Hypercar', images: ['https://minibricks.com/cdn/shop/files/MYSTERYBox2.jpg?v=1702408273&width=800'] },
@@ -34,18 +34,13 @@ const recentSpins = [
 export default function MysteryBoxDetailPage() {
     const [activeBox, setActiveBox] = useState(blindBoxTypes[0]);
     const [showSpin, setShowSpin] = useState(false);
-    const [prize, setPrize] = useState<string | null>(null);
-    const [showResult, setShowResult] = useState(false);
+    const visibleItems = 5;
+    const itemWidth = 150;
 
-    const handleSpinFinish = (result: string) => {
-        setShowSpin(false);
-        setPrize(result);
-        setTimeout(() => setShowResult(true), 300); // mở dialog kết quả sau 300ms
-    };
-
+    const containerWidth = itemWidth * visibleItems;
 
     return (
-        <main className="max-w-7xl mx-auto px-4 py-10">
+        <div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 {/* Left: Image + Categories */}
                 <div>
@@ -102,20 +97,23 @@ export default function MysteryBoxDetailPage() {
 
 
                     {/* Action buttons */}
-                    <div className="mt-6 space-y-3">
+                    <div className="mt-6 space-y-6">
                         <div className="flex items-center justify-between">
                             <a className='font-medium text-gray-500'>Lượt quay: 2</a>
                             <Button variant="link" className='text-sm font-normal hover:underline cursor-pointer text-gray-500'>Mua thêm lượt quay (250k)</Button>
                         </div>
-                        <Button variant="default" className="w-full cursor-pointer" onClick={() => setShowSpin(true)}>
+                        <Button variant="default" size="lg" className="w-full cursor-pointer
+                            text-base bg-red-600 hover:bg-red-700"
+                            onClick={() => setShowSpin(true)}>
                             Quay
                         </Button>
-                        <div className="flex gap-4 mt-4">
-                            <Button size="lg" className="text-base px-6 py-4 cursor-pointer">
+                        <div className="flex items-center gap-4">
+                            <QuantityCounter />
+                            <Button size="lg" className="text-base cursor-pointer ">
                                 Thêm vào giỏ
                             </Button>
-                            <Button variant="secondary" size="lg" className="text-base px-6 py-4 cursor-pointer">
-                                Mua bằng VNPAY
+                            <Button variant="secondary" size="lg" className="text-base  cursor-pointer">
+                                Thanh toán ngay
                             </Button>
                         </div>
                     </div>
@@ -154,7 +152,7 @@ export default function MysteryBoxDetailPage() {
 
             {showSpin && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                    <div className="relative p-6 w-full max-w-2xl animate-scaleIn">
+                    <div className={`relative p-6 animate-scaleIn`} style={{ width: `${containerWidth}px` }}>
                         <SpinBox />
                     </div>
                     <Button
@@ -167,6 +165,6 @@ export default function MysteryBoxDetailPage() {
             )}
 
 
-        </main>
+        </div>
     );
 }

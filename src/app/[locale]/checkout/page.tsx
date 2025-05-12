@@ -26,9 +26,9 @@ const mockCart = [
 ];
 
 const paymentMethods = [
-    { id: 'paypal', label: 'Thanh toán bằng PayPal' },
-    { id: 'vnpay', label: 'Thanh toán qua VNPay' },
     { id: 'cod', label: 'Thanh toán khi nhận hàng (COD)' },
+    { id: 'vnpay', label: 'Thanh toán qua VNPay' },
+    { id: 'paypal', label: 'Thanh toán bằng PayPal' },
 ];
 
 export default function CheckoutPage() {
@@ -49,7 +49,7 @@ export default function CheckoutPage() {
     };
 
     return (
-        <main className="max-w-2xl mx-auto px-4 py-8 space-y-8">
+        <div className='space-y-6'>
             <h1 className="text-2xl font-bold flex items-center gap-2"><ReceiptText /> Thanh toán</h1>
             {/* Danh sách sản phẩm trong giỏ hàng */}
             <div className="mt-6">
@@ -123,8 +123,8 @@ export default function CheckoutPage() {
                 <RadioGroup defaultValue="cod" onValueChange={setPayment}>
                     {paymentMethods.map((method) => (
                         <div key={method.id} className="flex items-center space-x-2">
-                            <RadioGroupItem value={method.id} id={method.id} />
-                            <Label htmlFor={method.id}>{method.label}</Label>
+                            <RadioGroupItem value={method.id} id={method.id} className=' cursor-pointer' />
+                            <Label htmlFor={method.id} className=' cursor-pointer'>{method.label}</Label>
                         </div>
                     ))}
                 </RadioGroup>
@@ -133,6 +133,6 @@ export default function CheckoutPage() {
             <Button size="lg" className="w-full mt-4" onClick={handleSubmit}>
                 Xác nhận đặt hàng
             </Button>
-        </main>
+        </div>
     );
 }

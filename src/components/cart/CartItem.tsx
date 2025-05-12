@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import QuantityCounter from '@/components/QuantityCounter';
+import { Minus } from 'lucide-react';
 
 type CartItemProps = {
     product: {
@@ -29,16 +30,13 @@ export default function CartItem({ product, onQuantityChange, onRemove }: CartIt
             <div className="flex-1">
                 <h3 className="font-semibold">{product.name}</h3>
                 <p className="text-sm text-muted-foreground">{product.price.toLocaleString()}đ</p>
-                <div className="mt-2 flex items-center gap-2">
-                    <Input
-                        type="number"
+                <div className="mt-2 flex justify-between items-center gap-4">
+                    <QuantityCounter
                         value={product.quantity}
-                        onChange={(e) => onQuantityChange(Number(e.target.value))}
-                        className="w-20"
-                        min={1}
+                        onChange={(val) => onQuantityChange(val)}
                     />
-                    <Button variant="destructive" size="sm" onClick={onRemove}>
-                        Xóa
+                    <Button className='cursor-pointer' variant="outline" size="icon" onClick={onRemove}>
+                        <Minus className="w-4 h-4" />
                     </Button>
                 </div>
             </div>

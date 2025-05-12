@@ -3,9 +3,10 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import { getMessages } from 'next-intl/server';
+import NextTopLoader from 'nextjs-toploader';
 
 import "@/app/globals.css";
 
@@ -22,9 +23,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
     title: "GearBricks",
     description: "Resell bricks and own designs",
-    icons: {
-        icon: "logo.ico",
-    },
 };
 
 export default async function LocaleLayout({
@@ -45,9 +43,16 @@ export default async function LocaleLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
+                <NextTopLoader
+                    color="#6366f1"
+                    height={3}
+                    showSpinner={false}
+                />
                 <Header />
                 <NextIntlClientProvider locale={locale} messages={messages}>
-                    {children}
+                    <main className='max-w-7xl mx-auto px-4 py-8 min-h-screen'>
+                        {children}
+                    </main>
                 </NextIntlClientProvider>
                 <Footer />
             </body>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { PartyPopper } from 'lucide-react';
@@ -16,24 +16,34 @@ const boxProducts = [
 ];
 
 export default function SpinBox() {
+    const itemWidth = 150;
+    const visibleItems = 5;
+    const centerIndex = Math.floor(visibleItems / 2);
+    const loopCount = 10;
+
+    const extendedProducts = Array(loopCount).fill(boxProducts).flat();
     const [spinning, setSpinning] = useState(false);
-    const [animationClass, setAnimationClass] = useState('');
     const [prize, setPrize] = useState<string | null>(null);
     const [showDialog, setShowDialog] = useState(false);
+    const [translateX, setTranslateX] = useState(0);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const handleSpin = () => {
         if (spinning) return;
 
         setSpinning(true);
         setPrize(null);
-        setAnimationClass('animate-infinite-scroll');
+        setShowDialog(false);
 
-        const randomIndex = Math.floor(Math.random() * boxProducts.length);
-        const selected = boxProducts[randomIndex];
+        const finalIndex = Math.floor(Math.random() * boxProducts.length);
+        const middleOfLoop = Math.floor(extendedProducts.length / 2);
+        const targetIndex = middleOfLoop + finalIndex;
+
+        const targetTranslateX = itemWidth * (targetIndex - centerIndex);
+        setTranslateX(targetTranslateX);
 
         setTimeout(() => {
-            setAnimationClass(''); // stop animation
-            setPrize(selected);
+            setPrize(boxProducts[finalIndex]);
             setShowDialog(true);
             setSpinning(false);
         }, 3000);
@@ -41,51 +51,50 @@ export default function SpinBox() {
 
     return (
         <div className="space-y-6">
-            {/* Strip animation */}
-            <div className="overflow-hidden border rounded-lg h-[140px] relative">
+            <div className="relative border rounded-lg h-[150px] overflow-hidden p-2">
+                {/* Frame in the middle */}
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-[140px] border-4 border-red-500 z-10 pointer-events-none"></div>
+
+                {/* Strip */}
                 <div
-                    className={`flex gap-4 px-4 py-2 w-max ${animationClass}`}
+                    ref={containerRef}
+                    className="flex gap-2 transition-all duration-[3000ms] ease-out"
+                    style={{ transform: `translateX(-${translateX}px)` }}
                 >
-                    {[...boxProducts, ...boxProducts].map((src, idx) => (
+                    {extendedProducts.map((src, idx) => (
                         <Image
                             key={idx}
                             src={src}
                             alt={`Item ${idx}`}
-                            width={120}
-                            height={120}
-                            className="rounded-md flex-shrink-0 object-cover"
+                            width={130}
+                            height={130}
+                            className="rounded-md object-cover flex-shrink-0"
                         />
                     ))}
                 </div>
             </div>
 
-            <Button onClick={handleSpin} disabled={spinning} className="w-full cursor-pointer">
+            <Button onClick={handleSpin} disabled={spinning} className="w-full">
                 {spinning ? 'Đang quay...' : '🎰 Quay ngay'}
             </Button>
 
-            {/* Kết quả trúng */}
-            {showDialog && (
+            {showDialog && prize && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                    <div className="relative rounded-xl shadow-lg p-6 w-full max-w-md animate-scaleIn bg-white">
+                    <div className="bg-white rounded-xl p-6 shadow-lg max-w-md animate-scaleIn">
                         <div className="text-center">
                             <h2 className="text-xl font-semibold flex items-center justify-center gap-2 text-green-600 mb-4">
                                 <PartyPopper className="w-6 h-6" /> Bạn đã trúng!
                             </h2>
-
-                            {prize && (
-                                <Image
-                                    src={prize}
-                                    alt="Prize"
-                                    width={200}
-                                    height={200}
-                                    className="rounded-xl mx-auto shadow"
-                                />
-                            )}
-
+                            <Image
+                                src={prize}
+                                alt="Prize"
+                                width={200}
+                                height={200}
+                                className="rounded-xl mx-auto shadow"
+                            />
                             <p className="mt-4 text-sm text-gray-600">
                                 Chúc mừng bạn đã quay trúng phần thưởng này!
                             </p>
-
                             <button
                                 onClick={() => setShowDialog(false)}
                                 className="mt-6 bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md"

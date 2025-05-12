@@ -1,5 +1,5 @@
-'use client';
-
+import React from "react";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import {
     NavigationMenu,
@@ -7,10 +7,12 @@ import {
     NavigationMenuItem,
     NavigationMenuLink,
     navigationMenuTriggerStyle,
+    NavigationMenuTrigger,
+    NavigationMenuContent,
 } from "@/components/ui/navigation-menu";
 import { User, ShoppingCart, Search, AlignJustify } from "lucide-react";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import {
     DropdownMenu,
@@ -18,6 +20,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import CategoryDropdown from "./CategoryDropdown";
 
 export default function Header() {
     return (
@@ -33,25 +36,23 @@ export default function Header() {
                     <NavigationMenu>
                         <NavigationMenuList className="flex items-center gap-4">
                             <NavigationMenuItem>
-                                <NavigationMenuLink asChild>
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                                     <Link href="/category/all">Newest</Link>
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
-                                <NavigationMenuLink asChild>
-                                    <Link href="/mystery-box">Best seller</Link>
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                                    <Link href="/">Best seller</Link>
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
-                                <NavigationMenuLink asChild>
-                                    <Link href="/category">Categories</Link>
-                                </NavigationMenuLink>
+                                <CategoryDropdown />
                             </NavigationMenuItem>
                             <NavigationMenuItem>
-                                <NavigationMenuLink asChild>
+                                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                                     <Link href="/mystery-box" className="relative inline-block">
                                         Mystery box
-                                        <span className="absolute -top-1 -right-2 text-[10px] font-semibold text-white bg-red-500 px-1.5 py-0.5 rounded-full animate-pulse shadow">
+                                        <span className="absolute -top-3 -right-2 text-[10px] font-semibold text-white bg-red-500 px-1.5 py-0.5 rounded-full animate-pulse shadow">
                                             250k
                                         </span>
                                     </Link>

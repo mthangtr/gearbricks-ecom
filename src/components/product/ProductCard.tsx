@@ -1,5 +1,3 @@
-'use client';
-
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,7 +9,7 @@ export default function ProductCard({ product }: { product: Product }) {
             <Link href={`/product/${product.slug}`} className="block">
                 <div className="relative w-full aspect-[4/3]">
                     <Image
-                        src={product.images[0]}
+                        src={product.images[product.thumbnailIndex || 0] || product.images[0]}
                         alt={product.name}
                         fill
                         className="object-cover"

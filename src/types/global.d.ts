@@ -1,17 +1,20 @@
 export type Product = {
-  id: string;
+  _id: string;
   slug: string;
   name: string;
   price: number;
   images: string[];
+  thumbnailIndex?: number;
   stock?: number;
   category?: string;
   colors?: string[];
   reviews?: Review[];
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type Review = {
-  id: string;
+  _id: string;
   userId: string;
   productId: string;
   rating: number;
@@ -19,7 +22,7 @@ export type Review = {
 };
 
 export type User = {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   phone?: string;
@@ -29,7 +32,7 @@ export type User = {
 };
 
 export type Order = {
-  id: string;
+  _id: string;
   userId: string;
   items: Product[];
   total: number;
@@ -37,7 +40,7 @@ export type Order = {
 };
 
 export type MysteryBox = {
-  id: string;
+  _id: string;
   type: string;
   price: number;
   products: Product[];
