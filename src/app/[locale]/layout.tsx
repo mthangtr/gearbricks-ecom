@@ -7,6 +7,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { getMessages } from 'next-intl/server';
 import NextTopLoader from 'nextjs-toploader';
+import { SessionClientProvider } from '../../components/provider/SessionProvider';
 
 import "@/app/globals.css";
 
@@ -47,13 +48,15 @@ export default async function LocaleLayout({
                     height={3}
                     showSpinner={false}
                 />
-                <Header />
                 <NextIntlClientProvider locale={locale} messages={messages}>
-                    <main className='max-w-7xl mx-auto px-4 py-8 min-h-screen'>
-                        {children}
-                    </main>
+                    <SessionClientProvider>
+                        <Header />
+                        <main className='max-w-7xl mx-auto px-4 py-8 min-h-screen'>
+                            {children}
+                        </main>
+                        <Footer />
+                    </SessionClientProvider>
                 </NextIntlClientProvider>
-                <Footer />
             </body>
         </html>
     );

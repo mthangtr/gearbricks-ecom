@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import CategoryDropdown from "./CategoryDropdown";
 import SearchInput from "../SearchInput";
-import Image from "next/image";
+import UserProfileWrapper from "@/components/wrapper/UserProfileWrapper";
 
 export default function Header() {
     return (
@@ -68,11 +68,7 @@ export default function Header() {
                             <ShoppingCart />
                         </Button>
                     </Link>
-                    <Link href="/login">
-                        <Button className="cursor-pointer" variant="ghost" size="icon">
-                            <User />
-                        </Button>
-                    </Link>
+                    <UserProfileWrapper />
                     <LocaleSwitcher />
                 </div>
 

@@ -35,7 +35,7 @@ export default function ProductInfo({ product }: { product: Product }) {
             </p>
 
             {/* Nút hành động lớn hơn */}
-            <div className="flex gap-4 mt-4">
+            <div className="flex gap-4 mt-4 flex-wrap">
                 <QuantityCounter />
                 <Button size="lg" className="text-base px-6 py-4 cursor-pointer">
                     Thêm vào giỏ

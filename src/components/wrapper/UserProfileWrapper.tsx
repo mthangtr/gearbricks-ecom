@@ -1,0 +1,76 @@
+"use client";
+
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User as UserIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+export default function UserProfileWrapper() {
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    if (status === "loading") {
+        return (
+            <Button variant="ghost" size="icon" disabled>
+                <UserIcon className="animate-pulse" />
+            </Button>
+        );
+    }
+
+    if (!session) {
+        return (
+            <Link href="/login">
+                <Button variant="ghost" size="icon">
+                    <UserIcon />
+                </Button>
+            </Link>
+        );
+    }
+
+    const { user } = session;
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="cursor-pointer">
+                    <UserIcon />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel className="font-semibold">
+                    Hi, {user?.name || user?.email}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                    <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Link href="/orders">Orders</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Link href="/settings">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                    <Link href="/help">Help</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Link href="/contact">Contact Us</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer" onSelect={() => signOut({ callbackUrl: "/" })}>
+                    Logout
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}

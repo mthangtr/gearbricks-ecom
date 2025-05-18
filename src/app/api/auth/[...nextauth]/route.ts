@@ -1,11 +1,12 @@
 // app/api/auth/[...nextauth]/route.ts
-
-import NextAuth, { NextAuthOptions, Session } from "next-auth";
+import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongoose";
 import { User, IUser } from "@/models/User";
+import type { NextAuthOptions } from "next-auth";
+import type { Session } from "next-auth";
+import bcrypt from "bcrypt";
 
 // Extend the Session user type to include _id
 declare module "next-auth" {
@@ -15,17 +16,15 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       _id?: string;
+      isAdmin?: boolean; // <-- thêm
     };
   }
 }
 
+// 1. Kết nối DB một lần
 await connectDB();
 
-// Base options without maxAge/cookie overrides
-const baseOptions: Omit<NextAuthOptions, "session" | "cookies"> & {
-  session: { strategy: "jwt" };
-  cookies?: NextAuthOptions["cookies"];
-} = {
+export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   providers: [
     CredentialsProvider({
@@ -44,7 +43,12 @@ const baseOptions: Omit<NextAuthOptions, "session" | "cookies"> & {
         if (!user) throw new Error("User not found");
         const valid = await user.comparePassword(credentials.password);
         if (!valid) throw new Error("Invalid password");
-        return { id: user._id.toString(), name: user.name, email: user.email };
+        return {
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          isAdmin: user.isAdmin,
+        };
       },
     }),
     GoogleProvider({
@@ -52,53 +56,49 @@ const baseOptions: Omit<NextAuthOptions, "session" | "cookies"> & {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
-  pages: {
-    signIn: "/login",
-    error: "/login",
-  },
   callbacks: {
+    // 2. Upsert Google user và gán user.id để jwt callback xài
+    async signIn({ user, account }) {
+      if (account && account.provider === "google" && user.email) {
+        let dbUser = await User.findOne({ email: user.email });
+        const randomPassword = Math.random().toString(36).slice(-8);
+        const bcryptRandomPassword = await bcrypt.hash(randomPassword, 10);
+        if (!dbUser) {
+          dbUser = await User.create({
+            name: user.name!,
+            email: user.email,
+            password: bcryptRandomPassword,
+          });
+        }
+        user.name = dbUser.name;
+        (user as any).id = dbUser._id.toString();
+      }
+      return true;
+    },
     async jwt({ token, user }) {
-      if (user) token.id = (user as any).id;
+      if (user) {
+        token.id = (user as any).id;
+        token.name = (user as any).name;
+        token.isAdmin = (user as any).isAdmin;
+      }
       return token;
     },
     async session({ session, token }) {
-      if (token.id && session.user) session.user._id = token.id as string;
+      if (session.user) {
+        session.user._id = token.id as string;
+        session.user.name = token.name as string;
+        session.user.isAdmin = token.isAdmin as boolean; // <-- thêm
+      }
       return session;
     },
   },
+  pages: {
+    signIn: "/login", // hoặc `/vi/login` nếu bạn dùng locale
+    error: "/login", // redirect khi có error
+  },
 };
 
-async function handleAuth(req: NextRequest) {
-  // parse remember-me flag from query params
-  const url = new URL(req.url);
-  const remember = url.searchParams.get("remember") === "true";
-
-  // compute maxAge: 30 days if remember, else session cookie
-  const maxAge = remember ? 30 * 24 * 60 * 60 : undefined;
-
-  // build full options including dynamic session maxAge and cookie settings
-  const options: NextAuthOptions = {
-    ...baseOptions,
-    session: {
-      strategy: "jwt",
-      ...(maxAge ? { maxAge } : {}),
-    },
-    cookies: {
-      sessionToken: {
-        name: "next-auth.session-token",
-        options: {
-          httpOnly: true,
-          sameSite: "lax",
-          path: "/",
-          secure: process.env.NODE_ENV === "production",
-          ...(maxAge ? { maxAge } : {}),
-        },
-      },
-    },
-  };
-
-  // delegate to NextAuth with our dynamic options
-  return NextAuth(options)(req);
-}
-
-export { handleAuth as GET, handleAuth as POST };
+// 3. Xuất handler cho App Router (Edge hoặc Node)
+export const runtime = "nodejs"; // hoặc omit nếu muốn nodejs
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

@@ -1,11 +1,18 @@
-// app/[locale]/login/page.tsx
-'use client';
+"use client";
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import GoogleIcon from '@/assets/icons/GoogleIcon';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+} from '@/components/ui/card';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -37,64 +44,70 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="max-w-md mx-auto py-16 space-y-4">
-            <h1 className="text-2xl font-bold flex justify-between items-center">Đăng nhập<span className='text-sm text-blue-600 hover:underline font-normal cursor-pointer'>Chưa có tài khoản?</span></h1>
-
-            {error && (
-                <div className="text-red-600 text-sm">
-                    {error}
-                </div>
-            )}
-
-            <form onSubmit={onSubmit} className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium">Email</label>
-                    <input
-                        type="email"
-                        required
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        className="mt-1 block w-full border px-3 py-2 rounded-md"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium">Mật khẩu</label>
-                    <input
-                        type="password"
-                        required
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        className="mt-1 block w-full border px-3 py-2 rounded-md"
-                    />
-                </div>
-
-                <div className="flex items-center justify-between">
-                    <label className="flex items-center text-sm">
-                        <input
-                            type="checkbox"
-                            checked={remember}
-                            onChange={e => setRemember(e.target.checked)}
-                            className="mr-2 cursor-pointer"
-                        />
-                        Ghi nhớ đăng nhập
-                    </label>
-                    <a href="/forgot-password" className="text-sm text-blue-600 hover:underline">
-                        Quên mật khẩu?
-                    </a>
-                </div>
-
-                <Button type="submit" size="lg" className="w-full cursor-pointer">
-                    Đăng nhập
-                </Button>
-            </form>
-
-            <div className="text-center">
-                <p className="text-sm text-gray-600 mb-4">— Hoặc —</p>
-                <Button variant="outline" size="lg" onClick={onGoogle} className="w-full cursor-pointer">
-                    <GoogleIcon />Đăng nhập với Google
-                </Button>
-            </div>
+        <div className="flex justify-center items-center py-16">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <CardTitle>Đăng nhập</CardTitle>
+                    <CardDescription>
+                        Chưa có tài khoản?{' '}
+                        <Link href="/register" className="text-blue-600 hover:underline">
+                            Đăng ký ngay
+                        </Link>
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
+                    <form onSubmit={onSubmit} className="space-y-4">
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium">
+                                Email
+                            </label>
+                            <input
+                                id="email"
+                                type="email"
+                                required
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                className="mt-1 block w-full border px-3 py-2 rounded-md"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium">
+                                Mật khẩu
+                            </label>
+                            <input
+                                id="password"
+                                type="password"
+                                required
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                className="mt-1 block w-full border px-3 py-2 rounded-md"
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <label className="flex items-center text-sm">
+                                <input
+                                    type="checkbox"
+                                    checked={remember}
+                                    onChange={e => setRemember(e.target.checked)}
+                                    className="mr-2 cursor-pointer"
+                                />
+                                Ghi nhớ đăng nhập
+                            </label>
+                            <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+                                Quên mật khẩu?
+                            </Link>
+                        </div>
+                        <Button type="submit" size="lg" className="w-full cursor-pointer">
+                            Đăng nhập
+                        </Button>
+                        <div className="text-center text-sm text-gray-600">— Hoặc —</div>
+                        <Button variant="outline" size="lg" onClick={onGoogle} className="w-full cursor-pointer">
+                            <GoogleIcon /> Đăng nhập với Google
+                        </Button>
+                    </form>
+                </CardContent>
+            </Card>
         </div>
     );
 }
