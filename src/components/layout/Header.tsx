@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/navigation-menu";
 import { User, ShoppingCart, AlignJustify } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import {
     DropdownMenu,
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import CategoryDropdown from "./CategoryDropdown";
 import SearchInput from "../SearchInput";
+import Image from "next/image";
 
 export default function Header() {
     return (
@@ -51,7 +51,7 @@ export default function Header() {
                                     <Link href="/mystery-box" className="relative inline-block">
                                         Mystery box
                                         <span className="absolute -top-2 -right-2 text-[10px] font-semibold text-white bg-red-500 px-1.5 py-0.5 rounded-full animate-pulse shadow">
-                                            250k
+                                            210k
                                         </span>
                                     </Link>
                                 </NavigationMenuLink>
@@ -68,9 +68,11 @@ export default function Header() {
                             <ShoppingCart />
                         </Button>
                     </Link>
-                    <Button className="cursor-pointer" variant="ghost" size="icon">
-                        <User />
-                    </Button>
+                    <Link href="/login">
+                        <Button className="cursor-pointer" variant="ghost" size="icon">
+                            <User />
+                        </Button>
+                    </Link>
                     <LocaleSwitcher />
                 </div>
 

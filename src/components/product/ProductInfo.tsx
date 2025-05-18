@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import RatingStars from "./RatingStars";
-import ReviewSummary from "./ReviewSummary";
 import { Product } from "@/types/global";
+import QuantityCounter from '../QuantityCounter';
 
 export default function ProductInfo({ product }: { product: Product }) {
     return (
@@ -13,6 +13,13 @@ export default function ProductInfo({ product }: { product: Product }) {
 
             {/* Đánh giá */}
             <RatingStars rating={4.5} reviewCount={12} />
+            {/* Số lượng đã mua */}
+            <p className="text-sm text-muted-foreground">
+                Đã bán:{" "}
+                <span className="font-medium text-foreground">
+                    112 sản phẩm
+                </span>
+            </p>
 
             {/* Trạng thái hàng */}
             <p className="text-base text-muted-foreground">
@@ -29,6 +36,7 @@ export default function ProductInfo({ product }: { product: Product }) {
 
             {/* Nút hành động lớn hơn */}
             <div className="flex gap-4 mt-4">
+                <QuantityCounter />
                 <Button size="lg" className="text-base px-6 py-4 cursor-pointer">
                     Thêm vào giỏ
                 </Button>

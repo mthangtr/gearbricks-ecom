@@ -94,6 +94,7 @@ export default function Footer() {
                                 setError(null);
 
                                 try {
+                                    const slug = makeSlug(formData.name);
                                     const res = await fetch("/api/products", {
                                         method: "POST",
                                         headers: {
@@ -101,7 +102,7 @@ export default function Footer() {
                                         },
                                         body: JSON.stringify({
                                             name: formData.name,
-                                            slug: formData.name.toLowerCase().replace(/\s+/g, "-"),
+                                            slug,
                                             price: Number(formData.price),
                                             category: formData.category,
                                             colors: formData.colors.split(",").map(c => c.trim()),
@@ -202,4 +203,14 @@ export default function Footer() {
             </div>
         </footer>
     );
+}
+
+function makeSlug(str: string) {
+    return str
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/[\s-]+/g, '-');
 }

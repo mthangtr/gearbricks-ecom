@@ -6,6 +6,7 @@ export type Product = {
   images: string[];
   thumbnailIndex?: number;
   stock?: number;
+  sold?: number;
   category?: string;
   colors?: string[];
   reviews?: Review[];
@@ -29,6 +30,15 @@ export type User = {
   balance: number;
   orders?: Order[];
   reviews?: Review[];
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+  isAdmin?: boolean;
 };
 
 export type Order = {

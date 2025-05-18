@@ -1,15 +1,36 @@
 import { notFound } from 'next/navigation';
-import { getProductBySlug, getRelatedProducts } from '@/lib/data';
-import ProductGallery from '@/components/product/ProductGallery';
 import ProductInfo from '@/components/product/ProductInfo';
 import RelatedProducts from '@/components/product/RelatedProducts';
+import { Product } from '@/types/global';
+import ProductGallery from '@/components/product/ProductGallery';
 
-export default async function ProductDetailServer({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProductDetailPage({
+    params,
+}: {
+    params: { slug: string };
+}) {
     const { slug } = await params;
-    const product = await getProductBySlug(slug);
-    if (!product) return notFound();
 
-    const related = getRelatedProducts(product.category ?? '', product._id);
+    const baseUrl =
+        process.env.NODE_ENV === 'development'
+            ? `http://${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`
+            : `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+    const res = await fetch(
+        `${baseUrl}/api/products/detail?slug=${encodeURIComponent(slug)}`,
+        { cache: 'no-store' }
+    );
+    if (!res.ok) {
+        return notFound();
+    }
+    const product: Product = await res.json();
+
+    const relRes = await fetch(
+        `${baseUrl}/api/products/related?category=${encodeURIComponent(
+            product.category ?? ''
+        )}&exclude=${encodeURIComponent(product._id)}`,
+        { cache: 'no-store' }
+    );
+    const related = relRes.ok ? await relRes.json() : [];
 
     return (
         <div>
@@ -17,7 +38,7 @@ export default async function ProductDetailServer({ params }: { params: Promise<
                 <ProductGallery images={product.images} />
                 <ProductInfo product={product} />
             </div>
-            <RelatedProducts products={related} />
+            <RelatedProducts category={product.category ?? ''} slug={slug} />
         </div>
     );
 }

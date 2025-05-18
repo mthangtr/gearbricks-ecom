@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Gift, PartyPopper } from 'lucide-react';
 import QuantityCounter from '@/components/QuantityCounter';
 import SpinboxWrapper from '@/components/wrapper/SpinboxWrapper';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 const boxProducts = [
     'https://minibricks.com/cdn/shop/files/6CA83CCB-A18B-4718-8D04-DB15B09730C6.jpg?v=1745826847&width=800',
@@ -28,7 +29,7 @@ export default function MysteryBoxDetailPage() {
                 {/* Left: Image + Categories */}
                 <div>
                     <Image
-                        src="/images/blindbox_thumbnail.webp"
+                        src="/images/blindboxbanner.webp"
                         alt="Blind Box"
                         width={400}
                         height={400}
@@ -42,21 +43,23 @@ export default function MysteryBoxDetailPage() {
                     <p className="text-sm text-gray-500 mt-1">Đã có 2,314 lượt mở</p>
 
                     {/* Images of possible prizes - scrollable row */}
-                    <div className="mt-4 overflow-x-auto scrollbar-hide">
-                        <div className="flex gap-3 w-max pr-4">
-                            {boxProducts.map((src, idx) => (
-                                <Image
-                                    key={idx}
-                                    src={src}
-                                    alt={`Prize ${idx}`}
-                                    width={120}
-                                    height={120}
-                                    className="rounded-md object-cover flex-shrink-0"
-                                />
-                            ))}
-                        </div>
+                    <div className="mt-4">
+                        <ScrollArea className="w-full max-w-full rounded-md border pb-2">
+                            <div className="flex w-max space-x-3 p-2">
+                                {boxProducts.map((src, idx) => (
+                                    <Image
+                                        key={idx}
+                                        src={src}
+                                        alt={`Prize ${idx}`}
+                                        width={120}
+                                        height={120}
+                                        className="rounded-md object-cover flex-shrink-0"
+                                    />
+                                ))}
+                            </div>
+                            <ScrollBar orientation="horizontal" />
+                        </ScrollArea>
                     </div>
-
 
                     {/* Action buttons */}
                     <div className="mt-6 space-y-6">

@@ -121,14 +121,6 @@
   }
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
 @keyframes infiniteScroll {
   0% {
     transform: translateX(0);

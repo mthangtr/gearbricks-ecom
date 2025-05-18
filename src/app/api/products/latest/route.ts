@@ -7,7 +7,7 @@ await connectDB();
 // GET - Trả về 5 sản phẩm mới nhất
 export async function GET(req: NextRequest) {
   try {
-    const products = await Product.find().sort({ createdAt: -1 }).limit(5);
+    const products = await Product.find().sort({ createdAt: -1 }).limit(6);
     return NextResponse.json(products);
   } catch (err) {
     console.error("Error fetching latest products:", err);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { PartyPopper } from 'lucide-react';
@@ -16,107 +16,136 @@ const boxProducts = [
 ];
 
 export default function SpinBox() {
-    const itemWidth = 138; // 130px image + 8px gap
-    const visibleItems = 5;
-    const centerIndex = Math.floor(visibleItems / 2);
-    const loopCount = 10;
+    const ITEM_SIZE = 130;     // px
+    const GAP = 8;             // px between items
+    const PAD = 16;            // px total horizontal padding (p-2)
+    const LOOP_COUNT = 10;
 
-    const extendedProducts = Array(loopCount).fill(boxProducts).flat();
+    const [visible, setVisible] = useState(5);
+    const [offset, setOffset] = useState(0);
     const [spinning, setSpinning] = useState(false);
     const [prize, setPrize] = useState<string | null>(null);
     const [showDialog, setShowDialog] = useState(false);
-    const [translateX, setTranslateX] = useState(0);
-    const [transitionEnabled, setTransitionEnabled] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const [animate, setAnimate] = useState(false);
+
+    const items = Array(LOOP_COUNT).fill(boxProducts).flat();
+    const centerSlot = Math.floor(visible / 2);
+
+    // responsive breakpoints
+    useEffect(() => {
+        const onResize = () => {
+            const w = window.innerWidth;
+            if (w < 480) setVisible(1);
+            else if (w < 768) setVisible(3);
+            else setVisible(5);
+        };
+        window.addEventListener('resize', onResize);
+        onResize();
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
+
+    // calculate container width exactly
+    const containerWidth =
+        visible * ITEM_SIZE +
+        (visible - 1) * GAP +
+        PAD;
 
     const handleSpin = () => {
         if (spinning) return;
         setSpinning(true);
-        setPrize(null);
-        setShowDialog(false);
+        setAnimate(false);
+        setOffset(0);
 
-        // Reset position without transition
-        setTransitionEnabled(false);
-        setTranslateX(0);
+        // pick random prize index and compute target offset
+        const prizeIdx = Math.floor(Math.random() * boxProducts.length);
+        const mid = Math.floor(items.length / 2);
+        const targetIndex = mid + prizeIdx;
+        const step = ITEM_SIZE + GAP;
+        const targetOffset = step * (targetIndex - centerSlot);
 
-        // Calculate target
-        const finalIndex = Math.floor(Math.random() * boxProducts.length);
-        const middleOfLoop = Math.floor(extendedProducts.length / 2);
-        const targetIndex = middleOfLoop + finalIndex;
-        const targetTranslateX = itemWidth * (targetIndex - centerIndex);
-
-        // Next frame: enable transition & spin
-        requestAnimationFrame(() => {
-            setTransitionEnabled(true);
-            setTranslateX(targetTranslateX);
-        });
-
-        // After animation ends
+        // small timeout to ensure reset applies without transition
         setTimeout(() => {
-            setPrize(boxProducts[finalIndex]);
+            setAnimate(true);
+            setOffset(targetOffset);
+        }, 50);
+
+        // show prize dialog after animation
+        setTimeout(() => {
+            setPrize(boxProducts[prizeIdx]);
             setShowDialog(true);
             setSpinning(false);
-        }, 3000);
+        }, 3050);
     };
 
     return (
         <div className="space-y-6">
+            {/* spinner container */}
             <div
-                className="relative border rounded-lg h-[150px] overflow-hidden p-2"
-                style={{ width: `${visibleItems * itemWidth + 16}px` }}  // +16 = 8px padding trái + 8px phải
+                className="relative mx-auto overflow-hidden rounded-lg border p-2"
+                style={{ width: `${containerWidth}px` }}
             >
-                {/* 2) Frame ở giữa, width = chính xác itemWidth */}
-                <div
-                    className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full z-10 pointer-events-none"
-                    style={{ width: `${itemWidth}px` }}
-                >
-                    <div className="border-4 border-red-500 h-full rounded-md" />
+                {/* static overlay ring at center */}
+                <div className="absolute inset-y-2 left-1/2 transform -translate-x-1/2 pointer-events-none z-10">
+                    <div
+                        className="w-[132px] h-[130px] border-4 border-red-500 rounded-md"
+                    />
                 </div>
 
-                {/* 3) Strip như cũ */}
+                {/* strip of items */}
                 <div
-                    ref={containerRef}
-                    className={`${transitionEnabled ? 'transition-transform duration-[3000ms] ease-out ' : ''}flex gap-2`}
-                    style={{ transform: `translateX(${-translateX}px)` }}
+                    className={`flex gap-2 ${animate ? 'transition-transform duration-[3000ms] ease-out' : ''
+                        }`}
+                    style={{ transform: `translateX(${-offset}px)` }}
                 >
-                    {extendedProducts.map((src, idx) => (
-                        <Image
+                    {items.map((src, idx) => (
+                        <div
                             key={idx}
-                            src={src}
-                            alt={`Item ${idx}`}
-                            width={130}
-                            height={130}
-                            className="rounded-md object-cover flex-shrink-0"
-                        />
+                            className="flex-shrink-0"
+                            style={{ width: `${ITEM_SIZE}px`, height: `${ITEM_SIZE}px` }}
+                        >
+                            <Image
+                                src={src}
+                                alt={`Item ${idx}`}
+                                width={ITEM_SIZE}
+                                height={ITEM_SIZE}
+                                className="rounded-md object-cover"
+                            />
+                        </div>
                     ))}
                 </div>
             </div>
 
-            <Button onClick={handleSpin} disabled={spinning} className="w-full cursor-pointer text-base">
+            {/* spin button */}
+            <Button
+                onClick={handleSpin}
+                disabled={spinning}
+                className="w-full text-base cursor-pointer bg-red-600 hover:bg-red-700"
+            >
                 {spinning ? 'Đang quay...' : '🎰 Quay ngay'}
             </Button>
 
+            {/* prize dialog */}
             {showDialog && prize && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                    <div className="bg-white rounded-xl p-6 shadow-lg max-w-md animate-scaleIn">
+                    <div className="max-w-md rounded-xl bg-white p-6 shadow-lg animate-scaleIn">
                         <div className="text-center">
-                            <h2 className="text-xl font-semibold flex items-center justify-center gap-2 text-green-600 mb-4">
-                                <PartyPopper className="w-6 h-6" /> Bạn đã trúng!
+                            <h2 className="mb-4 flex items-center justify-center gap-2 text-xl font-semibold text-green-600">
+                                <PartyPopper className="h-6 w-6" /> Bạn đã trúng!
                             </h2>
                             <Image
                                 src={prize}
                                 alt="Prize"
                                 width={200}
                                 height={200}
-                                className="rounded-xl mx-auto shadow"
+                                className="mx-auto mb-4 rounded-xl shadow"
                             />
-                            <p className="mt-4 text-sm text-gray-600">
+                            <p className="mb-6 text-sm text-gray-600">
                                 Chúc mừng bạn đã quay trúng phần thưởng này!
                             </p>
                             <Button
                                 variant="secondary"
                                 onClick={() => setShowDialog(false)}
-                                className="mt-6 bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md cursor-pointer"
+                                className="px-6 py-2 rounded-md cursor-pointer"
                             >
                                 Đóng
                             </Button>
