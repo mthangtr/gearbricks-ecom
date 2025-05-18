@@ -40,9 +40,8 @@ export default async function LocaleLayout({
 
     return (
         <html lang={locale}>
-            <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-            >
+            <head />
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <NextTopLoader
                     color="#6366f1"
                     height={3}

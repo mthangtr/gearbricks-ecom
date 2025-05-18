@@ -1,19 +1,8 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
 import Image from 'next/image';
-import clsx from 'clsx';
 import { Gift, PartyPopper } from 'lucide-react';
-import SpinBox from '@/components/SpinBox';
 import QuantityCounter from '@/components/QuantityCounter';
-
-const blindBoxTypes = [
-    { id: 'hypercar', label: 'Hypercar', images: ['https://minibricks.com/cdn/shop/files/MYSTERYBox2.jpg?v=1702408273&width=800'] },
-    { id: 'supercar', label: 'Supercar', images: ['https://minibricks.com/cdn/shop/files/MYSTERYBox2.jpg?v=1702408273&width=800'] },
-    { id: 'muscle', label: 'Muscle Car', images: ['https://minibricks.com/cdn/shop/files/MYSTERYBox2.jpg?v=1702408273&width=800'] },
-    { id: 'racing', label: 'Racing Car', images: ['https://minibricks.com/cdn/shop/files/MYSTERYBox2.jpg?v=1702408273&width=800'] },
-];
+import SpinboxWrapper from '@/components/wrapper/SpinboxWrapper';
 
 const boxProducts = [
     'https://minibricks.com/cdn/shop/files/6CA83CCB-A18B-4718-8D04-DB15B09730C6.jpg?v=1745826847&width=800',
@@ -32,12 +21,6 @@ const recentSpins = [
 ];
 
 export default function MysteryBoxDetailPage() {
-    const [activeBox, setActiveBox] = useState(blindBoxTypes[0]);
-    const [showSpin, setShowSpin] = useState(false);
-    const visibleItems = 5;
-    const itemWidth = 150;
-
-    const containerWidth = itemWidth * visibleItems;
 
     return (
         <div>
@@ -45,38 +28,17 @@ export default function MysteryBoxDetailPage() {
                 {/* Left: Image + Categories */}
                 <div>
                     <Image
-                        src="https://minibricks.com/cdn/shop/files/MYSTERYBox2.jpg?v=1702408273&width=800"
+                        src="/images/blindbox_thumbnail.webp"
                         alt="Blind Box"
                         width={400}
                         height={400}
                         className="w-full rounded-xl object-cover"
                     />
-                    {/* Hình ảnh chọn loại BlindBox */}
-                    <div className="mt-4 flex gap-4 overflow-x-auto scrollbar-hide pb-2">
-                        {blindBoxTypes.map((box) => (
-                            <div
-                                key={box.id}
-                                className={clsx(
-                                    'rounded-lg border-2 p-1 min-w-[100px] cursor-pointer transition-all',
-                                    activeBox.id === box.id ? 'border-blue-500' : 'border-gray-200'
-                                )}
-                                onClick={() => setActiveBox(box)}
-                            >
-                                <Image
-                                    src={box.images[0]}
-                                    alt={box.label}
-                                    width={100}
-                                    height={100}
-                                    className="rounded-md object-cover"
-                                />
-                            </div>
-                        ))}
-                    </div>
                 </div>
 
                 {/* Right: Info + Actions */}
                 <div>
-                    <h1 className="text-2xl font-bold flex items-center gap-2"><Gift /> Blindbox Hypercar Edition</h1>
+                    <h1 className="text-2xl font-bold flex items-center gap-2"><Gift /> Blindbox Cars Edition</h1>
                     <p className="text-sm text-gray-500 mt-1">Đã có 2,314 lượt mở</p>
 
                     {/* Images of possible prizes - scrollable row */}
@@ -100,13 +62,9 @@ export default function MysteryBoxDetailPage() {
                     <div className="mt-6 space-y-6">
                         <div className="flex items-center justify-between">
                             <a className='font-medium text-gray-500'>Lượt quay: 2</a>
-                            <Button variant="link" className='text-sm font-normal hover:underline cursor-pointer text-gray-500'>Mua thêm lượt quay (250k)</Button>
+                            <Button variant="link" className='text-sm font-normal hover:underline cursor-pointer text-gray-500'>Mua thêm lượt quay (210k)</Button>
                         </div>
-                        <Button variant="default" size="lg" className="w-full cursor-pointer
-                            text-base bg-red-600 hover:bg-red-700"
-                            onClick={() => setShowSpin(true)}>
-                            Quay
-                        </Button>
+                        <SpinboxWrapper />
                         <div className="flex items-center gap-4">
                             <QuantityCounter />
                             <Button size="lg" className="text-base cursor-pointer ">
@@ -121,7 +79,7 @@ export default function MysteryBoxDetailPage() {
                     {/* Description */}
                     <div className="mt-6 text-sm text-gray-600 leading-relaxed space-y-3">
                         <p>
-                            Hộp <strong>{activeBox.label}</strong> bao gồm những mẫu xe mô hình độc quyền thuộc dòng {activeBox.label.toLowerCase()} như Ferrari, McLaren, Koenigsegg và nhiều hơn nữa.
+                            Hộp <strong>Blindbox</strong> bao gồm những mẫu xe mô hình thể thao thuộc dòng như Ferrari, McLaren, Koenigsegg và nhiều hơn nữa.
                             Bạn có thể <span className="text-blue-600 font-medium">quay thử</span> hoặc <span className="text-blue-600 font-medium">mua về nhà</span> để giữ nguyên sự bất ngờ.
                         </p>
 
@@ -149,22 +107,6 @@ export default function MysteryBoxDetailPage() {
                     ))}
                 </ul>
             </div>
-
-            {showSpin && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                    <div className={`relative p-6 animate-scaleIn`} style={{ width: `${containerWidth}px` }}>
-                        <SpinBox />
-                    </div>
-                    <Button
-                        onClick={() => setShowSpin(false)}
-                        className="absolute top-4 right-4 cursor-pointer"
-                    >
-                        <span className="text-lg">&times;</span>
-                    </Button>
-                </div>
-            )}
-
-
         </div>
     );
 }

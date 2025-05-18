@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { PartyPopper } from 'lucide-react';
@@ -16,7 +16,7 @@ const boxProducts = [
 ];
 
 export default function SpinBox() {
-    const itemWidth = 150;
+    const itemWidth = 138; // 130px image + 8px gap
     const visibleItems = 5;
     const centerIndex = Math.floor(visibleItems / 2);
     const loopCount = 10;
@@ -26,22 +26,32 @@ export default function SpinBox() {
     const [prize, setPrize] = useState<string | null>(null);
     const [showDialog, setShowDialog] = useState(false);
     const [translateX, setTranslateX] = useState(0);
+    const [transitionEnabled, setTransitionEnabled] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
     const handleSpin = () => {
         if (spinning) return;
-
         setSpinning(true);
         setPrize(null);
         setShowDialog(false);
 
+        // Reset position without transition
+        setTransitionEnabled(false);
+        setTranslateX(0);
+
+        // Calculate target
         const finalIndex = Math.floor(Math.random() * boxProducts.length);
         const middleOfLoop = Math.floor(extendedProducts.length / 2);
         const targetIndex = middleOfLoop + finalIndex;
-
         const targetTranslateX = itemWidth * (targetIndex - centerIndex);
-        setTranslateX(targetTranslateX);
 
+        // Next frame: enable transition & spin
+        requestAnimationFrame(() => {
+            setTransitionEnabled(true);
+            setTranslateX(targetTranslateX);
+        });
+
+        // After animation ends
         setTimeout(() => {
             setPrize(boxProducts[finalIndex]);
             setShowDialog(true);
@@ -51,15 +61,23 @@ export default function SpinBox() {
 
     return (
         <div className="space-y-6">
-            <div className="relative border rounded-lg h-[150px] overflow-hidden p-2">
-                {/* Frame in the middle */}
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-[140px] border-4 border-red-500 z-10 pointer-events-none"></div>
+            <div
+                className="relative border rounded-lg h-[150px] overflow-hidden p-2"
+                style={{ width: `${visibleItems * itemWidth + 16}px` }}  // +16 = 8px padding trái + 8px phải
+            >
+                {/* 2) Frame ở giữa, width = chính xác itemWidth */}
+                <div
+                    className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full z-10 pointer-events-none"
+                    style={{ width: `${itemWidth}px` }}
+                >
+                    <div className="border-4 border-red-500 h-full rounded-md" />
+                </div>
 
-                {/* Strip */}
+                {/* 3) Strip như cũ */}
                 <div
                     ref={containerRef}
-                    className="flex gap-2 transition-all duration-[3000ms] ease-out"
-                    style={{ transform: `translateX(-${translateX}px)` }}
+                    className={`${transitionEnabled ? 'transition-transform duration-[3000ms] ease-out ' : ''}flex gap-2`}
+                    style={{ transform: `translateX(${-translateX}px)` }}
                 >
                     {extendedProducts.map((src, idx) => (
                         <Image
@@ -74,7 +92,7 @@ export default function SpinBox() {
                 </div>
             </div>
 
-            <Button onClick={handleSpin} disabled={spinning} className="w-full">
+            <Button onClick={handleSpin} disabled={spinning} className="w-full cursor-pointer text-base">
                 {spinning ? 'Đang quay...' : '🎰 Quay ngay'}
             </Button>
 
@@ -95,12 +113,13 @@ export default function SpinBox() {
                             <p className="mt-4 text-sm text-gray-600">
                                 Chúc mừng bạn đã quay trúng phần thưởng này!
                             </p>
-                            <button
+                            <Button
+                                variant="secondary"
                                 onClick={() => setShowDialog(false)}
-                                className="mt-6 bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md"
+                                className="mt-6 bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md cursor-pointer"
                             >
                                 Đóng
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
