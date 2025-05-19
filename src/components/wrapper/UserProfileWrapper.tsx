@@ -1,7 +1,6 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
     DropdownMenu,
@@ -16,7 +15,6 @@ import { Button } from "@/components/ui/button";
 
 export default function UserProfileWrapper() {
     const { data: session, status } = useSession();
-    const router = useRouter();
 
     if (status === "loading") {
         return (

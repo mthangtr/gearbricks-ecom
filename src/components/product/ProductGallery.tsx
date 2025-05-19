@@ -24,6 +24,8 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
                     alt={`Image ${selectedIndex + 1}`}
                     fill
                     className="object-cover"
+                    priority
+                    sizes="(max-width: 768px) 100vw, 33vw"
                 />
             </div>
 
@@ -48,6 +50,8 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
                                 alt={`Thumbnail ${i + 1}`}
                                 fill
                                 className="object-cover cursor-pointer"
+                                priority
+                                sizes="(max-width: 768px) 100vw, 33vw"
                             />
                         </button>
                     );

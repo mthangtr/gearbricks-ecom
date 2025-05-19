@@ -1,17 +1,21 @@
+export type ImageItem = {
+  url: string;
+  index: number;
+};
+
 export type Product = {
   _id: string;
   slug: string;
   name: string;
   price: number;
-  images: string[];
-  thumbnailIndex?: number;
-  stock?: number;
-  sold?: number;
-  category?: string;
-  colors?: string[];
-  reviews?: Review[];
-  createdAt?: string;
-  updatedAt?: string;
+  images: ImageItem[];
+  stock: number;
+  sold: number;
+  category: string;
+  colors: string[];
+  reviews: Review[];
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Review = {

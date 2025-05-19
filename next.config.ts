@@ -6,6 +6,5 @@ const nextConfig: NextConfig = {
     domains: ["minibricks.com", "res.cloudinary.com"],
   },
 };
-
 const withNextIntl = createNextIntlPlugin();
 export default withNextIntl(nextConfig);

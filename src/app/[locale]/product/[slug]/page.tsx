@@ -35,7 +35,7 @@ export default async function ProductDetailPage({
     return (
         <div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <ProductGallery images={product.images} />
+                <ProductGallery images={product.images.map(img => img.url)} />
                 <ProductInfo product={product} />
             </div>
             <RelatedProducts category={product.category ?? ''} slug={slug} />

@@ -8,23 +8,22 @@ await connectDB();
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const {
-      name,
-      slug,
-      price,
-      images,
-      thumbnailIndex,
-      stock,
-      category,
-      colors,
-    } = body;
+    const { name, slug, price, images, stock, category, colors } = body;
+
+    const normalizedImages = Array.isArray(images)
+      ? images
+          .map((img: any) => ({
+            url: String(img.url),
+            index: Number(img.index) || 0,
+          }))
+          .sort((a, b) => a.index - b.index)
+      : [];
 
     const newProduct = new Product({
       name,
       slug,
       price,
-      images,
-      thumbnailIndex: thumbnailIndex || 0,
+      images: normalizedImages,
       stock,
       category,
       colors,

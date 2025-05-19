@@ -16,7 +16,7 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       _id?: string;
-      isAdmin?: boolean; // <-- thêm
+      isAdmin?: boolean;
     };
   }
 }
@@ -68,6 +68,7 @@ export const authOptions: NextAuthOptions = {
             name: user.name!,
             email: user.email,
             password: bcryptRandomPassword,
+            isAdmin: false,
           });
         }
         user.name = dbUser.name;
@@ -79,7 +80,11 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = (user as any).id;
         token.name = (user as any).name;
-        token.isAdmin = (user as any).isAdmin;
+        token.isAdmin = (user as any).isAdmin ?? false;
+      } else if (token.id) {
+        await connectDB();
+        const dbUser = await User.findById(token.id);
+        token.isAdmin = dbUser?.isAdmin ?? false;
       }
       return token;
     },
@@ -87,7 +92,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user._id = token.id as string;
         session.user.name = token.name as string;
-        session.user.isAdmin = token.isAdmin as boolean; // <-- thêm
+        session.user.isAdmin = token.isAdmin as boolean;
       }
       return session;
     },
