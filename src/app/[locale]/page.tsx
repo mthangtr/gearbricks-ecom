@@ -2,6 +2,7 @@ import NewestProductSection from "@/components/homepage/NewestProductSection";
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import BestSellerProductsSection from "@/components/homepage/BestSellerProductsSection";
+import Image from 'next/image';
 
 export default async function HomePageServer() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/latest`, {
@@ -45,10 +46,13 @@ export default async function HomePageServer() {
 
                 {/* Background image */}
                 <div className="absolute inset-0 z-0">
-                    <img
+                    <Image
                         src="/images/mystery-box-banner.png"
                         alt="Mystery Box Background"
-                        className="w-full h-full object-cover"
+                        className="object-cover"
+                        priority
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        fill
                     />
                 </div>
 
@@ -71,20 +75,3 @@ export default async function HomePageServer() {
         </div>
     );
 }
-
-const bestSellers = [
-    {
-        _id: '4',
-        slug: 'Porsche-911-(930)-RWB',
-        name: 'Porsche 911 (930) RWB',
-        price: 305000,
-        images: ['https://minibricks.com/cdn/shop/files/D0925094-6411-40D3-A687-AB5D7BF789DA.jpg?v=1698577908&width=800'],
-    },
-    {
-        _id: '5',
-        slug: 'Porsche-911-(930)-RWB',
-        name: 'Porsche 911 (930) RWB',
-        price: 300000,
-        images: ['https://minibricks.com/cdn/shop/files/D0925094-6411-40D3-A687-AB5D7BF789DA.jpg?v=1698577908&width=800'],
-    },
-];

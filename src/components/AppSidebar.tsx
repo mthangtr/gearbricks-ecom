@@ -1,5 +1,5 @@
 "use client"
-import { ScrollText, Home, Package, Search, Box } from "lucide-react"
+import { ScrollText, Home, Package, Search, Box, HomeIcon } from "lucide-react"
 
 import {
     Sidebar,
@@ -11,7 +11,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-
+import Link from "next/link"
 // Menu items.
 const items = [
     {
@@ -34,6 +34,11 @@ const items = [
         url: "/admin/orders",
         icon: ScrollText,
     },
+    {
+        title: "Homepage",
+        url: "/vi",
+        icon: HomeIcon,
+    }
 ]
 
 export function AppSidebar() {
@@ -41,16 +46,16 @@ export function AppSidebar() {
         <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Application</SidebarGroupLabel>
+                    <SidebarGroupLabel>Admin</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild>
-                                        <a href={item.url}>
+                                        <Link href={item.url}>
                                             <item.icon />
                                             <span>{item.title}</span>
-                                        </a>
+                                        </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}

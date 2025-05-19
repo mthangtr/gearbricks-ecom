@@ -13,7 +13,11 @@ import {
 import { User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function UserProfileWrapper() {
+type UserProfileWrapperProps = {
+    isAdmin?: boolean;
+};
+
+export default function UserProfileWrapper({ isAdmin }: UserProfileWrapperProps) {
     const { data: session, status } = useSession();
 
     if (status === "loading") {
@@ -49,7 +53,11 @@ export default function UserProfileWrapper() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                    <Link href="/profile">Profile</Link>
+                    {isAdmin ? (
+                        <Link href="/admin/dashboard">Dashboard</Link>
+                    ) : (
+                        <Link href="/profile">Profile</Link>
+                    )}
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <Link href="/orders">Orders</Link>

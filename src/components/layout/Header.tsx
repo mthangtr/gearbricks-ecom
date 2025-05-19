@@ -19,8 +19,12 @@ import {
 import CategoryDropdown from "./CategoryDropdown";
 import SearchInput from "../SearchInput";
 import UserProfileWrapper from "@/components/wrapper/UserProfileWrapper";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export default function Header() {
+export default async function Header() {
+    const session = await getServerSession(authOptions);
+
     return (
         <header className="border-b bg-background sticky top-0 z-50 shadow-sm">
             <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -68,7 +72,7 @@ export default function Header() {
                             <ShoppingCart />
                         </Button>
                     </Link>
-                    <UserProfileWrapper />
+                    <UserProfileWrapper isAdmin={session?.user?.isAdmin} />
                     <LocaleSwitcher />
                 </div>
 

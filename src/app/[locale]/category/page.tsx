@@ -30,6 +30,15 @@ async function fetchProducts(category: string | null, search: string | null, pag
     return res.json();
 }
 
+const handleCategoryDisplay = (category: string) => {
+    // Chuyển đổi category thành tên hiển thị racing-car -> Racing Car
+    //bỏ dấu gạch ngang và viết hoa chữ cái đầu tiên
+    return category
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+}
+
 export default async function CategoryPage({
     searchParams,
 }: {
@@ -49,21 +58,6 @@ export default async function CategoryPage({
     }
 
     const { products, pagination } = data;
-
-    const handleCategoryDisplay = (category: string) => {
-        switch (category) {
-            case "all":
-                return "All";
-            case "classic":
-                return "Classic Cars";
-            case "race":
-                return "Race Cars";
-            case "super":
-                return "Super Cars";
-            default:
-                return category;
-        }
-    }
 
     return (
         <div>

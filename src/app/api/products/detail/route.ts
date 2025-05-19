@@ -1,3 +1,5 @@
+// api/products/detail/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongoose";
 import { Product } from "@/models/Product";
@@ -14,12 +16,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Slug is required" }, { status: 400 });
     }
 
-    const product = await Product.findOne({ slug });
+    const product = await Product.findOne({ slug })
+      .populate("category", "name")
+      .lean();
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
-
     return NextResponse.json(product);
   } catch (err) {
     console.error("Error fetching product:", err);

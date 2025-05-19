@@ -3,15 +3,20 @@ export type ImageItem = {
   index: number;
 };
 
+export type Category = {
+  _id: string;
+  name: string;
+};
+
 export type Product = {
   _id: string;
   slug: string;
   name: string;
   price: number;
   images: ImageItem[];
-  stock: number;
+  inStock: boolean;
   sold: number;
-  category: string;
+  category: Category;
   colors: string[];
   reviews: Review[];
   createdAt: string;

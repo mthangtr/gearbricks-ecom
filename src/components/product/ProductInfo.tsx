@@ -9,12 +9,22 @@ export default function ProductInfo({ product }: { product: Product }) {
     return (
         <div className="space-y-6">
             {/* Tên sản phẩm to, nổi bật */}
-            <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
+            <div>
+                <h1 className="text-4xl font-bold tracking-tight">{product.name}</h1>
+
+                {/* Category */}
+                <p className="text-md text-muted-foreground">
+                    Danh mục:{" "}
+                    <span className="font-medium text-foreground">
+                        {product.category.name}
+                    </span>
+                </p>
+            </div>
 
             {/* Đánh giá */}
             <RatingStars rating={4.5} reviewCount={12} />
             {/* Số lượng đã mua */}
-            <p className="text-sm text-muted-foreground">
+            <p className="text-md text-muted-foreground">
                 Đã bán:{" "}
                 <span className="font-medium text-foreground">
                     112 sản phẩm
@@ -25,7 +35,7 @@ export default function ProductInfo({ product }: { product: Product }) {
             <p className="text-base text-muted-foreground">
                 Tình trạng:{" "}
                 <span className="font-medium text-foreground">
-                    {product.stock && product.stock > 0 ? "Còn hàng" : "Hết hàng"}
+                    {handleInStockDisplay(product.inStock)}
                 </span>
             </p>
 
@@ -49,7 +59,26 @@ export default function ProductInfo({ product }: { product: Product }) {
             <p className="text-base text-foreground mt-6 leading-relaxed">
                 Đây là mô hình siêu xe tỉ lệ 1:24, chi tiết tinh xảo, phù hợp để trưng bày và sưu tầm. Sản phẩm lắp ráp từ nhiều mảnh nhỏ, kèm hướng dẫn chi tiết.
             </p>
-
+            {/* Có gì bên trong */}
+            <div className="mt-6">
+                <h2 className="text-lg font-semibold">Có gì bên trong</h2>
+                <ul className="list-disc list-inside mt-2">
+                    <li>1 mô hình xe</li>
+                    <li>1 bộ dụng cụ lắp ráp</li>
+                    <li>Hướng dẫn lắp ráp chi tiết</li>
+                </ul>
+                <p className="text-base text-foreground mt-2 leading-relaxed">
+                    Sản phẩm được đóng gói cẩn thận, đảm bảo an toàn trong quá trình vận chuyển.
+                </p>
+            </div>
         </div>
     );
+}
+
+const handleInStockDisplay = (inStock: boolean) => {
+    return inStock ? (
+        <span className="text-green-500">Còn hàng</span>
+    ) : (
+        <span className="text-red-500">Hết hàng</span>
+    )
 }

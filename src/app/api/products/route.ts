@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongoose";
-import { Product } from "@/models/Product";
+import { Product, Category } from "@/models/Product";
 
 await connectDB();
 
@@ -8,7 +8,15 @@ await connectDB();
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, slug, price, images, stock, category, colors } = body;
+    const { name, slug, price, images, inStock, category, colors } = body;
+
+    const catDoc = await Category.findById(category);
+    if (!catDoc) {
+      return NextResponse.json(
+        { error: "Category không hợp lệ" },
+        { status: 400 }
+      );
+    }
 
     const normalizedImages = Array.isArray(images)
       ? images
@@ -24,8 +32,8 @@ export async function POST(req: NextRequest) {
       slug,
       price,
       images: normalizedImages,
-      stock,
-      category,
+      inStock,
+      category: catDoc._id,
       colors,
     });
 

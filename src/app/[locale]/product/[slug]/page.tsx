@@ -4,7 +4,7 @@ import RelatedProducts from '@/components/product/RelatedProducts';
 import { Product } from '@/types/global';
 import ProductGallery from '@/components/product/ProductGallery';
 
-export default async function ProductDetailPage({
+async function ProductDetailPage({
     params,
 }: {
     params: { slug: string };
@@ -23,22 +23,15 @@ export default async function ProductDetailPage({
         return notFound();
     }
     const product: Product = await res.json();
-
-    const relRes = await fetch(
-        `${baseUrl}/api/products/related?category=${encodeURIComponent(
-            product.category ?? ''
-        )}&exclude=${encodeURIComponent(product._id)}`,
-        { cache: 'no-store' }
-    );
-    const related = relRes.ok ? await relRes.json() : [];
-
     return (
         <div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 ">
                 <ProductGallery images={product.images.map(img => img.url)} />
                 <ProductInfo product={product} />
             </div>
-            <RelatedProducts category={product.category ?? ''} slug={slug} />
+            <RelatedProducts category={product.category} slug={slug} />
         </div>
     );
 }
+
+export default ProductDetailPage;

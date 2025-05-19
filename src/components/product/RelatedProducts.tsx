@@ -1,9 +1,9 @@
 import ProductCard from './ProductCard'
-import { Product } from '@/types/global'
+import { Category, Product } from '@/types/global'
 import { notFound } from 'next/navigation'
 
 interface RelatedProductsProps {
-    category: string
+    category: Category
     slug: string
 }
 
@@ -18,12 +18,11 @@ export default async function RelatedProducts({
             : `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
 
     const url = `${baseUrl}/api/products/related?category=${encodeURIComponent(
-        category
+        category._id
     )}&slug=${encodeURIComponent(slug)}`
 
     const res = await fetch(url, { cache: 'no-store' })
     if (!res.ok) {
-        // nếu API trả về 400/404 thì văng 404 page
         return notFound()
     }
 

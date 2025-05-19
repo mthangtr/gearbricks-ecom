@@ -1,4 +1,4 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
@@ -43,10 +43,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 />
                 <SessionClientProvider>
                     <SidebarProvider>
-                        <div className="flex">
-                            <AppSidebar />
-                            <main className="flex-1">{children}</main>
-                        </div>
+                        <AppSidebar />
+                        <main className="flex-1 overflow-auto">
+                            <div className="flex items-center justify-between px-4 py-2 bg-accent border-b">
+                                <SidebarTrigger className="cursor-pointer" />
+                            </div>
+                            {children}
+                        </main>
                     </SidebarProvider>
                 </SessionClientProvider>
             </body>

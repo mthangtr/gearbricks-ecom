@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 
+const CategorySchema = new mongoose.Schema({
+  name: { type: String, required: true },
+});
+
 const ProductSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -12,8 +16,12 @@ const ProductSchema = new mongoose.Schema(
         url: { type: String, required: true },
       },
     ],
-    stock: { type: Number, default: 0 },
-    category: { type: String },
+    inStock: { type: Boolean, default: true },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
     colors: [{ type: String }],
   },
   {
@@ -24,10 +32,5 @@ const ProductSchema = new mongoose.Schema(
 export const Product =
   mongoose.models.Product || mongoose.model("Product", ProductSchema);
 
-// images lưu trữ URL của ảnh và thứ tự của các ảnh
-// images: [
-//   {
-//     index: { type: Number, required: true },
-//     url: { type: String, required: true },
-//   },
-// ],
+export const Category =
+  mongoose.models.Category || mongoose.model("Category", CategorySchema);

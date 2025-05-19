@@ -10,25 +10,35 @@ await connectDB();
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const category = searchParams.get("category");
+    const rawCategory = searchParams.get("category");
     const slug = searchParams.get("slug");
 
-    if (!category) {
+    if (!rawCategory) {
       return NextResponse.json(
         { error: "Category is required" },
         { status: 400 }
       );
     }
 
+    // 1) Chuyển category thành ObjectId
+    let categoryId: mongoose.Types.ObjectId;
+    try {
+      categoryId = new mongoose.Types.ObjectId(rawCategory);
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid category ID" },
+        { status: 400 }
+      );
+    }
+
+    // 2) Nếu có slug, tìm product hiện tại để exclude và lấy keywords
     let currentProductId: mongoose.Types.ObjectId | null = null;
     let keywords: string[] = [];
 
-    // 1) Nếu có slug thì load product hiện tại để lấy _id và keywords
     if (slug) {
-      const current = (await Product.findOne({ slug }).lean()) as {
-        _id: mongoose.Types.ObjectId;
-        name: string;
-      } | null;
+      const current = (await Product.findOne({ slug })
+        .select({ _id: 1, name: 1 })
+        .lean()) as { _id: mongoose.Types.ObjectId; name: string } | null;
       if (current) {
         currentProductId = current._id;
         keywords = current.name
@@ -38,9 +48,11 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // 2) Build pipeline để tìm keyword-matches
+    // 3) Build aggregation pipeline
     const pipeline: any[] = [
-      { $match: { category } },
+      // match đúng categoryId
+      { $match: { category: categoryId } },
+      // exclude product hiện tại nếu có
       ...(currentProductId
         ? [{ $match: { _id: { $ne: currentProductId } } }]
         : []),
@@ -72,27 +84,23 @@ export async function GET(req: NextRequest) {
         price: 1,
         images: 1,
         category: 1,
-        matchCount: 1,
       },
     });
 
-    // 3) Chạy aggregation để lấy related theo keyword (max 10)
     let related = await Product.aggregate(pipeline);
 
-    // 4) Nếu chưa đủ 10, bù bằng sản phẩm mới nhất
+    // 4) Nếu chưa đủ 10, bù thêm sản phẩm mới nhất cùng category
     if (related.length < 10) {
-      // các _id cần exclude: current + những đã lấy ở trên
       const excludeIds = related.map((p) => p._id);
       if (currentProductId) excludeIds.push(currentProductId);
 
-      // fetch thêm theo recency
       const additional = await Product.find({
-        category,
+        category: categoryId,
         _id: { $nin: excludeIds },
       })
         .sort({ createdAt: -1 })
         .limit(10 - related.length)
-        .select({ name: 1, slug: 1, price: 1, images: 1, category: 1 })
+        .select({ _id: 1, name: 1, slug: 1, price: 1, images: 1, category: 1 })
         .lean();
 
       related = related.concat(additional);
