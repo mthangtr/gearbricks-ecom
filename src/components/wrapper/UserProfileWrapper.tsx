@@ -43,7 +43,7 @@ export default function UserProfileWrapper({ isAdmin }: UserProfileWrapperProps)
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="cursor-pointer">
+                <Button variant="ghost" size="icon">
                     <UserIcon />
                 </Button>
             </DropdownMenuTrigger>

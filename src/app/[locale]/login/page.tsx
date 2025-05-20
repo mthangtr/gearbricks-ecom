@@ -101,11 +101,11 @@ export default function LoginPage() {
                         <Button type="submit" size="lg" className="w-full cursor-pointer">
                             Đăng nhập
                         </Button>
-                        <div className="text-center text-sm text-gray-600">— Hoặc —</div>
-                        <Button variant="outline" size="lg" onClick={onGoogle} className="w-full cursor-pointer">
-                            <GoogleIcon /> Đăng nhập với Google
-                        </Button>
                     </form>
+                    <div className="text-center text-sm text-gray-600 my-4">— Hoặc —</div>
+                    <Button variant="outline" size="lg" onClick={onGoogle} className="w-full cursor-pointer">
+                        <GoogleIcon /> Đăng nhập với Google
+                    </Button>
                 </CardContent>
             </Card>
         </div>

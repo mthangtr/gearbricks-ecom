@@ -31,8 +31,6 @@ async function fetchProducts(category: string | null, search: string | null, pag
 }
 
 const handleCategoryDisplay = (category: string) => {
-    // Chuyển đổi category thành tên hiển thị racing-car -> Racing Car
-    //bỏ dấu gạch ngang và viết hoa chữ cái đầu tiên
     return category
         .split("-")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

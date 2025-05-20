@@ -5,6 +5,13 @@ import RatingStars from "./RatingStars";
 import { Product } from "@/types/global";
 import QuantityCounter from '../QuantityCounter';
 
+const handleCategoryDisplay = (category: string) => {
+    return category
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+}
+
 export default function ProductInfo({ product }: { product: Product }) {
     return (
         <div className="space-y-6">
@@ -16,7 +23,7 @@ export default function ProductInfo({ product }: { product: Product }) {
                 <p className="text-md text-muted-foreground">
                     Danh mục:{" "}
                     <span className="font-medium text-foreground">
-                        {product.category.name}
+                        {handleCategoryDisplay(product.category.name)}
                     </span>
                 </p>
             </div>

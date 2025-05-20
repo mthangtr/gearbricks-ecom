@@ -106,11 +106,11 @@ export default function RegisterPage() {
                         <Button type="submit" size="lg" className="w-full cursor-pointer" disabled={isLoading}>
                             {isLoading ? "Đang đăng ký..." : "Đăng ký"}
                         </Button>
-                        <div className="text-center text-sm text-gray-600">— Hoặc —</div>
-                        <Button variant="outline" size="lg" onClick={handleGoogle} className="w-full cursor-pointer">
-                            <GoogleIcon /> Đăng ký với Google
-                        </Button>
                     </form>
+                    <div className="text-center text-sm text-gray-600 my-4">— Hoặc —</div>
+                    <Button variant="outline" size="lg" onClick={handleGoogle} className="w-full cursor-pointer">
+                        <GoogleIcon /> Đăng nhập với Google
+                    </Button>
                 </CardContent>
             </Card>
         </div>
