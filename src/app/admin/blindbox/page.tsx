@@ -1,3 +1,5 @@
+import CreateBlindBox from "@/components/blindbox/CreateBlindBox";
+
 function AdminBlindBoxManagement() {
     return (
         <>
@@ -5,6 +7,7 @@ function AdminBlindBoxManagement() {
             <p>This is the admin blind box management page.</p>
             <p>Here you can manage all the blind boxes.</p>
             <p>More features will be added soon.</p>
+            <CreateBlindBox />
         </>
     );
 }

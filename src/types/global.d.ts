@@ -58,9 +58,27 @@ export type Order = {
   createdAt: string;
 };
 
-export type MysteryBox = {
+export type Blindbox = {
   _id: string;
-  type: string;
+  slug: string;
+  title: string;
+  description: string;
   price: number;
-  products: Product[];
+  thumbnailUrl: string;
+  products: {
+    product: Product;
+    probability: number;
+  }[];
+  totalOpens: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type SpinRecord = {
+  _id: string;
+  userId: string;
+  blindboxId: string;
+  productId?: string;
+  success: boolean;
+  createdAt: string;
 };

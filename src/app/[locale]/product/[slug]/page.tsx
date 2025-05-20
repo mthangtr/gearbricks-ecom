@@ -1,3 +1,4 @@
+// app/product/[slug]/page.tsx
 import { notFound } from 'next/navigation';
 import ProductInfo from '@/components/product/ProductInfo';
 import RelatedProducts from '@/components/product/RelatedProducts';

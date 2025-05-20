@@ -52,7 +52,7 @@ export default async function Header() {
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                    <Link href="/mystery-box" className="relative inline-block">
+                                    <Link href="/mystery-box/blindbox-car-edition" className="relative inline-block">
                                         Mystery box
                                         <span className="absolute -top-2 -right-2 text-[10px] font-semibold text-white bg-red-500 px-1.5 py-0.5 rounded-full animate-pulse shadow">
                                             210k
@@ -95,7 +95,7 @@ export default async function Header() {
                                 <Link href="/category">Categories</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/mystery-box" className="">
+                                <Link href="/mystery-box/blindbox-car-edition" className="">
                                     Mystery box
                                     <span className="text-[10px] font-semibold text-white bg-red-500 px-1.5 py-0.5 rounded-full animate-pulse shadow">
                                         hot

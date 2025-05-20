@@ -8,6 +8,7 @@ import Footer from "@/components/layout/Footer";
 import { getMessages } from 'next-intl/server';
 import NextTopLoader from 'nextjs-toploader';
 import { SessionClientProvider } from '../../components/provider/SessionProvider';
+import { Toaster } from "@/components/ui/sonner";
 
 import "@/app/globals.css";
 
@@ -54,6 +55,7 @@ export default async function LocaleLayout({
                         <main className='max-w-7xl mx-auto px-4 py-8 min-h-screen'>
                             {children}
                         </main>
+                        <Toaster />
                         <Footer />
                     </SessionClientProvider>
                 </NextIntlClientProvider>

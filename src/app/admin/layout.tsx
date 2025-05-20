@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import NextTopLoader from 'nextjs-toploader';
 import { SessionClientProvider } from "@/components/provider/SessionProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 import "@/app/globals.css";
 
@@ -49,6 +50,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                                 <SidebarTrigger className="cursor-pointer" />
                             </div>
                             {children}
+                            <Toaster />
                         </main>
                     </SidebarProvider>
                 </SessionClientProvider>
