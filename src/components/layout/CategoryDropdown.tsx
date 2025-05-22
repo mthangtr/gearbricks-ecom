@@ -35,7 +35,7 @@ export default function CategoryDropdown() {
                 <div className="absolute z-50 mt-2 w-40 rounded-md border bg-white shadow-lg p-2 space-y-1">
                     <DropdownLink href="/category?category=all">All</DropdownLink>
                     <DropdownLink href="/category?category=classic-car">Classic Car</DropdownLink>
-                    <DropdownLink href="/category?category=racing-car">Race Car</DropdownLink>
+                    <DropdownLink href="/category?category=race-car">Race Car</DropdownLink>
                     <DropdownLink href="/category?category=super-car">Super Car</DropdownLink>
                 </div>
             )}

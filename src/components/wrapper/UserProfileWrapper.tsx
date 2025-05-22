@@ -43,7 +43,7 @@ export default function UserProfileWrapper({ isAdmin }: UserProfileWrapperProps)
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="cursor-pointer">
                     <UserIcon />
                 </Button>
             </DropdownMenuTrigger>
@@ -77,6 +77,6 @@ export default function UserProfileWrapper({ isAdmin }: UserProfileWrapperProps)
                     Logout
                 </DropdownMenuItem>
             </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu >
     );
 }

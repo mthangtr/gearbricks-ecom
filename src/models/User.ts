@@ -8,8 +8,8 @@ export interface IUser extends Document {
   password: string;
   phone?: string;
   balance: number;
-  orders?: any[];
-  reviews?: any[];
+  orders?: mongoose.Types.ObjectId[];
+  reviews?: mongoose.Types.ObjectId[];
   address?: {
     street: string;
     city: string;

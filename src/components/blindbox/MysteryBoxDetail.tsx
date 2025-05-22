@@ -10,7 +10,6 @@ import SpinboxWrapper from "@/components/wrapper/SpinboxWrapper";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Blindbox as BlindboxType } from "@/types/global";
 import { useState } from "react";
-import { Product } from '../../models/Product';
 
 // Nhúng luôn kiểu cho stats tại chỗ
 interface MysteryBoxDetailProps {
