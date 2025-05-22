@@ -1,15 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { uploadFile } from "@/lib/cloudinary";
+import sharp from "sharp"; // THÊM sharp
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get("file") as File;
+
   if (!file) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
+
   try {
-    const buffer = await Buffer.from(await file.arrayBuffer());
-    const res = (await uploadFile(buffer, "p-img")) as {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const isWebp = file.type === "image/webp" || file.name?.endsWith(".webp");
+
+    let processedBuffer: Buffer = buffer;
+
+    // Convert sang webp nếu không phải
+    if (!isWebp) {
+      processedBuffer = await sharp(buffer).webp({ quality: 80 }).toBuffer();
+    }
+
+    const res = (await uploadFile(processedBuffer, "p-img")) as {
       secure_url: string;
       public_id: string;
       format: string;

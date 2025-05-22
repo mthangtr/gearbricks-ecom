@@ -54,23 +54,23 @@ export default function UserProfileWrapper({ isAdmin }: UserProfileWrapperProps)
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                     {isAdmin ? (
-                        <Link href="/admin/dashboard">Dashboard</Link>
+                        <Link href="/admin/dashboard" className="w-full">Dashboard</Link>
                     ) : (
-                        <Link href="/profile">Profile</Link>
+                        <Link href="/profile" className="w-full">Profile</Link>
                     )}
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <Link href="/orders">Orders</Link>
+                    <Link href="/orders" className="w-full">Orders</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <Link href="/settings">Settings</Link>
+                    <Link href="/settings" className="w-full">Settings</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                    <Link href="/help">Help</Link>
+                    <Link href="/help" className="w-full">Help</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <Link href="/contact">Contact Us</Link>
+                    <Link href="/contact" className="w-full">Contact Us</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="cursor-pointer" onSelect={() => signOut({ callbackUrl: "/" })}>

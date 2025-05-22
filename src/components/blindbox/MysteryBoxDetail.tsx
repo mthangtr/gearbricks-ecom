@@ -10,7 +10,6 @@ import SpinboxWrapper from "@/components/wrapper/SpinboxWrapper";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Blindbox as BlindboxType } from "@/types/global";
 import { useState } from "react";
-
 // Nhúng luôn kiểu cho stats tại chỗ
 interface MysteryBoxDetailProps {
     blindbox: BlindboxType;
@@ -118,15 +117,25 @@ export default function MysteryBoxDetail({
                             <Button variant="secondary" size="lg" className="cursor-pointer">Thanh toán ngay</Button>
                         </div>
                     </div>
-                    <div className="mt-6">
-                        <p
-                            className="text-sm text-gray-500"
-                        >{blindbox.description}</p>
+                    <div className="mt-6 text-sm text-gray-600 leading-relaxed space-y-3">
+                        <p>
+                            Hộp <strong>Blindbox</strong> bao gồm những mẫu xe mô hình thể thao thuộc dòng như Ferrari, McLaren, Koenigsegg và nhiều hơn nữa.
+                            Bạn có thể <span className="text-blue-600 font-medium">quay thử</span> hoặc <span className="text-blue-600 font-medium">mua về nhà</span> để giữ nguyên sự bất ngờ.
+                        </p>
                     </div>
-
+                    <div className="mt-2">
+                        <h2 className="text-lg font-semibold">Có gì bên trong</h2>
+                        <ul className="list-disc list-inside mt-2">
+                            <li>1 mô hình xe</li>
+                            <li>1 bộ dụng cụ lắp ráp</li>
+                            <li>Hướng dẫn lắp ráp chi tiết</li>
+                        </ul>
+                        <p className="text-base text-foreground mt-2 leading-relaxed">
+                            Sản phẩm được đóng gói cẩn thận, đảm bảo an toàn trong quá trình vận chuyển.
+                        </p>
+                    </div>
                 </div>
             </div>
-
             {/* Recent Spins */}
             <div className="mt-16">
                 <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -144,6 +153,6 @@ export default function MysteryBoxDetail({
                     </li>
                 </ul>
             </div>
-        </div>
+        </div >
     );
 }

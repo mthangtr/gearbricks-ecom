@@ -10,9 +10,10 @@ interface Stats {
 }
 
 export default async function MysteryBoxSSRPage({
-    params }: {
-        params: Promise<{ slug: string }>
-    }) {
+    params
+}: {
+    params: Promise<{ slug: string }>
+}) {
     const { slug } = await params;
     const baseUrl =
         process.env.NODE_ENV === "development"
