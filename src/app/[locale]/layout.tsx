@@ -9,6 +9,7 @@ import { getMessages } from 'next-intl/server';
 import NextTopLoader from 'nextjs-toploader';
 import { SessionClientProvider } from '../../components/provider/SessionProvider';
 import { Toaster } from "@/components/ui/sonner";
+import { CartProvider } from '@/contexts/CartContext';
 
 import "@/app/globals.css";
 
@@ -51,12 +52,14 @@ export default async function LocaleLayout({
                 />
                 <NextIntlClientProvider locale={locale} messages={messages}>
                     <SessionClientProvider>
-                        <Header />
-                        <main className='max-w-7xl mx-auto px-4 py-8 min-h-screen'>
-                            {children}
-                        </main>
-                        <Toaster />
-                        <Footer />
+                        <CartProvider>
+                            <Header />
+                            <main className='max-w-7xl mx-auto px-4 py-8 min-h-screen'>
+                                {children}
+                            </main>
+                            <Toaster />
+                            <Footer />
+                        </CartProvider>
                     </SessionClientProvider>
                 </NextIntlClientProvider>
             </body>

@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import RatingStars from "./RatingStars";
 import { Product } from "@/types/global";
 import QuantityCounter from '../QuantityCounter';
+import { useCart } from '@/contexts/CartContext';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 const handleCategoryDisplay = (category: string) => {
     return category
@@ -13,6 +16,26 @@ const handleCategoryDisplay = (category: string) => {
 }
 
 export default function ProductInfo({ product }: { product: Product }) {
+    const { addToCart } = useCart();
+    const [quantity, setQuantity] = useState(1);
+
+    const handleAddToCart = () => {
+        if (!product.inStock) {
+            toast.error('Sản phẩm đã hết hàng');
+            return;
+        }
+
+        addToCart({
+            productId: product._id,
+            name: product.name,
+            price: product.price,
+            image: product.images[0].url,
+            quantity: quantity
+        });
+
+        toast.success('Đã thêm vào giỏ hàng');
+    };
+
     return (
         <div className="space-y-6">
             {/* Tên sản phẩm to, nổi bật */}
@@ -53,11 +76,21 @@ export default function ProductInfo({ product }: { product: Product }) {
 
             {/* Nút hành động lớn hơn */}
             <div className="flex gap-4 mt-4 flex-wrap">
-                <QuantityCounter />
-                <Button size="lg" className="text-base px-6 py-4 cursor-pointer">
+                <QuantityCounter value={quantity} onChange={setQuantity} />
+                <Button
+                    size="lg"
+                    className="text-base px-6 py-4 cursor-pointer"
+                    onClick={handleAddToCart}
+                    disabled={!product.inStock}
+                >
                     Thêm vào giỏ
                 </Button>
-                <Button variant="secondary" size="lg" className="text-base px-6 py-4 cursor-pointer">
+                <Button
+                    variant="secondary"
+                    size="lg"
+                    className="text-base px-6 py-4 cursor-pointer"
+                    disabled={!product.inStock}
+                >
                     Mua bằng VNPAY
                 </Button>
             </div>

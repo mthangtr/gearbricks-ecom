@@ -7,7 +7,7 @@ import {
     NavigationMenuLink,
     navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { User, ShoppingCart, AlignJustify } from "lucide-react";
+import { User, AlignJustify } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import {
@@ -21,6 +21,7 @@ import SearchInput from "../SearchInput";
 import UserProfileWrapper from "@/components/wrapper/UserProfileWrapper";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import CartIcon from "@/components/cart/CartIcon";
 
 export default async function Header() {
     const session = await getServerSession(authOptions);
@@ -67,11 +68,7 @@ export default async function Header() {
                 {/* Search + Icon + LocaleSwitcher (desktop) */}
                 <div className="hidden lg:flex items-center gap-2">
                     <SearchInput />
-                    <Link href="/cart">
-                        <Button className="cursor-pointer" variant="ghost" size="icon">
-                            <ShoppingCart />
-                        </Button>
-                    </Link>
+                    <CartIcon />
                     <UserProfileWrapper isAdmin={session?.user?.isAdmin} />
                     <LocaleSwitcher />
                 </div>
@@ -103,7 +100,7 @@ export default async function Header() {
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/cart"><ShoppingCart /> Cart</Link>
+                                <Link href="/cart">Cart</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link href="/profile"><User /> Profile</Link>
