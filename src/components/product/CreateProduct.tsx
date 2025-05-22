@@ -16,6 +16,7 @@ import { Check } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { toast } from "sonner"
 
 export default function CreateProduct() {
     const [loading, setLoading] = useState(false)
@@ -65,8 +66,9 @@ export default function CreateProduct() {
             setCategories((prev) => [...prev, saved])
             setFormData((f) => ({ ...f, category: saved._id }))
             setNewCategory("")
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err: unknown) {
+            if (err instanceof Error) setError(err.message)
+            else setError("Đã xảy ra lỗi")
         } finally {
             setLoading(false)
         }
@@ -91,8 +93,10 @@ export default function CreateProduct() {
                 ...prev,
                 ...uploaded.map((url, i) => ({ url, index: prev.length + i }))
             ]);
-        } catch (err: any) {
-            setError(err.message);
+            toast.success("Upload thành công")
+        } catch (err: unknown) {
+            if (err instanceof Error) setError(err.message)
+            else setError("Đã xảy ra lỗi")
         } finally {
             setLoading(false);
         }
@@ -141,8 +145,10 @@ export default function CreateProduct() {
                 inStock: "true",
             })
             setImages([])
-        } catch (err: any) {
-            setError(err.message)
+            toast.success("Tạo sản phẩm thành công")
+        } catch (err: unknown) {
+            if (err instanceof Error) setError(err.message)
+            else setError("Đã xảy ra lỗi")
         } finally {
             setLoading(false)
         }
@@ -210,13 +216,13 @@ export default function CreateProduct() {
                             setFormData((f) => ({ ...f, category: v }))
                         }
                     >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="w-full cursor-pointer">
                             <SelectValue placeholder="Chọn loại" />
                         </SelectTrigger>
                         <SelectContent>
                             {categories.map((cat) => (
-                                <SelectItem key={cat._id} value={cat._id}>
-                                    {cat.name}
+                                <SelectItem key={cat._id} value={cat._id} className="cursor-pointer">
+                                    {handleCategoryDisplay(cat.name)}
                                 </SelectItem>
                             ))}
 
@@ -239,56 +245,79 @@ export default function CreateProduct() {
                         </SelectContent>
                     </Select>
                 )}
+                {
+                    categories.length === 0 && (
+                        <div key="add-new" className="flex gap-2 p-2">
+                            <Input
+                                placeholder="Thêm loại mới"
+                                value={newCategory}
+                                onChange={(e) => setNewCategory(e.target.value)}
+                            />
+                            <Button
+                                type="button"
+                                variant="default"
+                                onClick={handleAddCategory}
+                                disabled={!newCategory.trim() || loading}
+                            >
+                                <Check />
+                            </Button>
+                        </div>
+                    )
+                }
 
                 {/* Images */}
                 <Label>Ảnh</Label>
                 <Input
+                    className="cursor-pointer"
                     type="file"
                     accept="image/*"
                     multiple
                     onChange={handleImageUpload}
                 />
-                {loading && (
-                    <div className="flex items-center gap-2 mt-2">
-                        <Spinner className="h-4 w-4 animate-spin" />
-                        <span>Đang upload...</span>
-                    </div>
-                )}
-                {images.length > 0 && (
-                    <div className="grid grid-cols-3 gap-4 mt-2">
-                        {images.map((img, idx) => (
-                            <div key={img.url} className="space-y-1">
-                                <div className="relative w-24 h-24 overflow-hidden rounded border">
-                                    <Image
-                                        src={img.url}
-                                        alt={`img-${idx}`}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor={`idx-${idx}`} className="text-xs">
-                                        Idx:
-                                    </Label>
-                                    <Input
-                                        id={`idx-${idx}`}
-                                        type="number"
-                                        value={img.index.toString()}
-                                        onChange={(e) => {
-                                            const newIndex = parseInt(e.target.value) || 0
-                                            setImages((list) =>
-                                                list.map((it, i) =>
-                                                    i === idx ? { ...it, index: newIndex } : it
+                {
+                    loading && (
+                        <div className="flex items-center gap-2 mt-2">
+                            <Spinner className="h-4 w-4 animate-spin" />
+                            <span>Đang upload...</span>
+                        </div>
+                    )
+                }
+                {
+                    images.length > 0 && (
+                        <div className=" flex flex-wrap gap-2 mt-2">
+                            {images.map((img, idx) => (
+                                <div key={img.url} className="space-y-1">
+                                    <div className="relative w-24 h-24 overflow-hidden rounded border">
+                                        <Image
+                                            src={img.url}
+                                            alt={`img-${idx}`}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                    <div className="flex items-center w-full gap-2">
+                                        <Input
+                                            id={`idx-${idx}`}
+                                            value={img.index.toString()}
+                                            onChange={(e) => {
+                                                if (e.target.value === "") return;
+                                                if (isNaN(parseInt(e.target.value))) return;
+                                                if (parseInt(e.target.value) <= 0) return;
+                                                const newIndex = parseInt(e.target.value) || 0
+                                                setImages((list) =>
+                                                    list.map((it, i) =>
+                                                        i === idx ? { ...it, index: newIndex } : it
+                                                    )
                                                 )
-                                            )
-                                        }}
-                                        className="w-12 text-xs"
-                                    />
+                                            }}
+                                            className="w-24 text-xs"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                            ))}
+                        </div>
+                    )
+                }
 
                 {/* Submit */}
                 <div className="flex gap-2">
@@ -313,7 +342,14 @@ export default function CreateProduct() {
                         Đặt lại
                     </Button>
                 </div>
-            </form>
-        </div>
+            </form >
+        </div >
     )
+}
+
+const handleCategoryDisplay = (category: string) => {
+    return category
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
 }

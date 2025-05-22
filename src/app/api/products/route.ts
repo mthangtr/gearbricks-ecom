@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     const normalizedImages = Array.isArray(images)
       ? images
-          .map((img: any) => ({
+          .map((img: { url: string; index: number }) => ({
             url: String(img.url),
             index: Number(img.index) || 0,
           }))

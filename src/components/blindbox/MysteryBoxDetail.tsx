@@ -9,6 +9,8 @@ import QuantityCounter from "@/components/QuantityCounter";
 import SpinboxWrapper from "@/components/wrapper/SpinboxWrapper";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Blindbox as BlindboxType } from "@/types/global";
+import { useState } from "react";
+import { Product } from '../../models/Product';
 
 // Nhúng luôn kiểu cho stats tại chỗ
 interface MysteryBoxDetailProps {
@@ -23,9 +25,7 @@ export default function MysteryBoxDetail({
     blindbox,
     stats,
 }: MysteryBoxDetailProps) {
-    const boxProducts = blindbox.products.map(
-        ({ product }) => product.images[0]?.url || ""
-    );
+    const [showRate, setShowRate] = useState(false);
 
     return (
         <div>
@@ -47,28 +47,60 @@ export default function MysteryBoxDetail({
                     <h1 className="text-2xl font-bold flex items-center gap-2">
                         <Gift /> {blindbox.title}
                     </h1>
-                    <p className="text-sm text-gray-500 mt-1">
-                        Đã có {blindbox.totalOpens.toLocaleString()} lượt mở
-                    </p>
+                    <div className="flex items-center justify-between">
+                        <p className="text-sm text-gray-500 mt-1">
+                            Đã có {blindbox.totalOpens.toLocaleString()} lượt mở
+                        </p>
+
+                        {/* Container tương đối để định vị popup */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowRate(!showRate)}
+                                className="font-normal text-sm hover:underline cursor-pointer mb-2 text-gray-800"
+                            >
+                                <span role="img" aria-label="target">🎯</span> Tỷ lệ trúng phần thưởng
+                            </button>
+
+                            {showRate && (
+                                <div className="absolute top-full left-0 mt-2 w-max min-w-[200px] z-10 text-sm text-gray-600">
+                                    <div className="border rounded-md p-4 bg-white shadow-md">
+                                        <ul className=" space-y-1 list-none">
+                                            {blindbox.products.map(({ product, probability }, i) => (
+                                                <li key={i}>
+                                                    <span className="font-medium">{probability}%</span> — {product.name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
                     {/* Carousel */}
                     <div className="mt-4">
                         <ScrollArea className="w-full rounded-md border pb-2">
                             <div className="flex w-max space-x-3 p-2">
-                                {boxProducts.map((src, i) => (
-                                    <Image
-                                        key={i}
-                                        src={src}
-                                        alt={`Prize ${i}`}
-                                        width={120}
-                                        height={120}
-                                        className="rounded-md object-cover flex-shrink-0"
-                                    />
+                                {blindbox.products.map(({ product }, i) => (
+                                    <div key={i} className="relative group">
+                                        <Image
+                                            src={product.images[0]?.url || ""}
+                                            alt={product.name}
+                                            width={120}
+                                            height={120}
+                                            className="rounded-md object-cover flex-shrink-0"
+                                            priority
+                                        />
+                                        <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/50 text-white text-xs px-2 py-1 rounded-b-md text-center">
+                                            {product.name}
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                             <ScrollBar orientation="horizontal" />
                         </ScrollArea>
                     </div>
+
 
                     {/* Actions */}
                     <div className="mt-6 space-y-6">
@@ -87,24 +119,12 @@ export default function MysteryBoxDetail({
                             <Button variant="secondary" size="lg" className="cursor-pointer">Thanh toán ngay</Button>
                         </div>
                     </div>
-
-                    {/* Description & Odds */}
-                    <div className="mt-6 text-sm text-gray-600 space-y-4">
-                        <p>{blindbox.description}</p>
-                        <div className="border rounded-md p-4 bg-gray-50">
-                            <h3 className="font-semibold mb-2 text-gray-800">
-                                🎯 Tỷ lệ trúng phần thưởng
-                            </h3>
-                            <ul className="list-disc list-inside space-y-1">
-                                {blindbox.products.map(({ product, probability }, i) => (
-                                    <li key={i}>
-                                        <span className="font-medium">{probability}%</span> —{" "}
-                                        {product.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                    <div className="mt-6">
+                        <p
+                            className="text-sm text-gray-500"
+                        >{blindbox.description}</p>
                     </div>
+
                 </div>
             </div>
 

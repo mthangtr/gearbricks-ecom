@@ -12,7 +12,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import CreateProduct from "@/components/product/CreateProduct"
-
+import Image from "next/image"
 export default function ProductDataTable() {
     const [data, setData] = useState<Product[]>([])
     const [isLoading, setIsLoading] = useState(false)
@@ -53,10 +53,13 @@ export default function ProductDataTable() {
                             <TableRow key={product._id}>
                                 <TableCell>
                                     {firstImage ? (
-                                        <img
+                                        <Image
                                             src={firstImage}
                                             alt={product.name}
                                             className="h-10 w-10 object-cover rounded"
+                                            width={40}
+                                            height={40}
+                                            priority
                                         />
                                     ) : (
                                         <div className="h-10 w-10 bg-gray-200 rounded" />
