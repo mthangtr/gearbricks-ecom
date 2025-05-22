@@ -14,7 +14,7 @@ export const cartService = {
   addToCart: (payload: AddToCartPayload): Cart => {
     const cart = cartService.getCart();
     const existingItemIndex = cart.items.findIndex(
-      (item) => item.productId === payload.productId
+      (item) => item.id === payload.id && item.type === payload.type
     );
 
     if (existingItemIndex > -1) {
@@ -23,7 +23,8 @@ export const cartService = {
     } else {
       // Add new item
       const newItem: CartItem = {
-        productId: payload.productId,
+        id: payload.id,
+        type: payload.type,
         name: payload.name,
         price: payload.price,
         quantity: payload.quantity || 1,
@@ -42,10 +43,14 @@ export const cartService = {
     return cart;
   },
 
-  updateCartItem: (productId: string, quantity: number): Cart => {
+  updateCartItem: (
+    id: string,
+    type: "product" | "blindbox",
+    quantity: number
+  ): Cart => {
     const cart = cartService.getCart();
     const itemIndex = cart.items.findIndex(
-      (item) => item.productId === productId
+      (item) => item.id === id && item.type === type
     );
 
     if (itemIndex > -1) {
@@ -67,9 +72,11 @@ export const cartService = {
     return cart;
   },
 
-  removeFromCart: (productId: string): Cart => {
+  removeFromCart: (id: string, type: "product" | "blindbox"): Cart => {
     const cart = cartService.getCart();
-    cart.items = cart.items.filter((item) => item.productId !== productId);
+    cart.items = cart.items.filter(
+      (item) => !(item.id === id && item.type === type)
+    );
 
     // Recalculate total price
     cart.totalPrice = cart.items.reduce(

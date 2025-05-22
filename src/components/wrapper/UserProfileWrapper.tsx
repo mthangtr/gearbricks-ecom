@@ -22,7 +22,7 @@ export default function UserProfileWrapper({ isAdmin }: UserProfileWrapperProps)
 
     if (status === "loading") {
         return (
-            <Button variant="ghost" size="icon" disabled>
+            <Button variant="ghost" size="icon" disabled className="cursor-not-allowed">
                 <UserIcon className="animate-pulse" />
             </Button>
         );
@@ -31,7 +31,7 @@ export default function UserProfileWrapper({ isAdmin }: UserProfileWrapperProps)
     if (!session) {
         return (
             <Link href="/login">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="cursor-pointer">
                     <UserIcon />
                 </Button>
             </Link>

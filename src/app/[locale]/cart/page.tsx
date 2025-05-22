@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { CartItem as CartItemType } from '@/types/global';
+
 export default function CartPage() {
     const { cart, updateCartItem, removeFromCart } = useCart();
     const router = useRouter();
@@ -26,10 +27,10 @@ export default function CartPage() {
                 <>
                     {cart.items.map((item: CartItemType) => (
                         <CartItem
-                            key={item.productId}
+                            key={`${item.type}-${item.id}`}
                             product={item}
-                            onQuantityChange={(qty) => updateCartItem(item.productId, qty)}
-                            onRemove={() => removeFromCart(item.productId)}
+                            onQuantityChange={(qty) => updateCartItem(item.id, item.type, qty)}
+                            onRemove={() => removeFromCart(item.id, item.type)}
                         />
                     ))}
                     <CartSummary total={cart.totalPrice} onCheckout={handleCheckout} />

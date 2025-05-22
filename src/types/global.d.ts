@@ -83,21 +83,24 @@ export type SpinRecord = {
   createdAt: string;
 };
 
-export interface CartItem {
-  productId: string;
+// Cart Types
+interface CartItem {
+  id: string;
+  type: "product" | "blindbox";
   name: string;
   price: number;
   quantity: number;
   image: string;
 }
 
-export interface Cart {
+interface Cart {
   items: CartItem[];
   totalPrice: number;
 }
 
-export interface AddToCartPayload {
-  productId: string;
+interface AddToCartPayload {
+  id: string;
+  type: "product" | "blindbox";
   name: string;
   price: number;
   image: string;

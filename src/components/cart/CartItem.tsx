@@ -11,22 +11,25 @@ interface CartItemProps {
 }
 
 export default function CartItem({ product, onQuantityChange, onRemove }: CartItemProps) {
-    const { name, price, quantity, image } = product;
+    const { name, price, quantity, image, type } = product;
 
     return (
-        <div className="flex items-center gap-4 p-2 border rounded-lg">
+        <div className="flex items-center gap-4 p-4 border rounded-lg">
             <div className="relative w-24 h-24">
                 <Image
                     src={image}
                     alt={name}
                     fill
                     className="object-cover rounded-md"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority
                 />
             </div>
             <div className="flex-1">
-                <h3 className="font-medium">{name}</h3>
+                <div className="flex items-center gap-2">
+                    <h3 className="font-medium">{name}</h3>
+                    <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
+                        {type === 'blindbox' ? 'Mystery Box' : 'Product'}
+                    </span>
+                </div>
                 <p className="text-gray-600">{price.toLocaleString('vi-VN')}đ</p>
             </div>
             <div className="flex items-center gap-2">

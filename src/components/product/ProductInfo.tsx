@@ -26,7 +26,8 @@ export default function ProductInfo({ product }: { product: Product }) {
         }
 
         addToCart({
-            productId: product._id,
+            id: product._id,
+            type: 'product',
             name: product.name,
             price: product.price,
             image: product.images[0].url,
@@ -95,10 +96,6 @@ export default function ProductInfo({ product }: { product: Product }) {
                 </Button>
             </div>
 
-            {/* Mô tả */}
-            <p className="text-base text-foreground mt-6 leading-relaxed">
-                Đây là mô hình siêu xe tỉ lệ 1:24, chi tiết tinh xảo, phù hợp để trưng bày và sưu tầm. Sản phẩm lắp ráp từ nhiều mảnh nhỏ, kèm hướng dẫn chi tiết.
-            </p>
             {/* Có gì bên trong */}
             <div className="mt-6">
                 <h2 className="text-lg font-semibold">Có gì bên trong</h2>

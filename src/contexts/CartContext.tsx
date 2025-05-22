@@ -1,14 +1,14 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Cart, AddToCartPayload } from '@/types/cart';
+import { Cart, AddToCartPayload } from '@/types/global';
 import { cartService } from '@/services/cartService';
 
 interface CartContextType {
     cart: Cart;
     addToCart: (payload: AddToCartPayload) => void;
-    updateCartItem: (productId: string, quantity: number) => void;
-    removeFromCart: (productId: string) => void;
+    updateCartItem: (id: string, type: 'product' | 'blindbox', quantity: number) => void;
+    removeFromCart: (id: string, type: 'product' | 'blindbox') => void;
     clearCart: () => void;
 }
 
@@ -27,13 +27,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setCart(updatedCart);
     };
 
-    const updateCartItem = (productId: string, quantity: number) => {
-        const updatedCart = cartService.updateCartItem(productId, quantity);
+    const updateCartItem = (id: string, type: 'product' | 'blindbox', quantity: number) => {
+        const updatedCart = cartService.updateCartItem(id, type, quantity);
         setCart(updatedCart);
     };
 
-    const removeFromCart = (productId: string) => {
-        const updatedCart = cartService.removeFromCart(productId);
+    const removeFromCart = (id: string, type: 'product' | 'blindbox') => {
+        const updatedCart = cartService.removeFromCart(id, type);
         setCart(updatedCart);
     };
 

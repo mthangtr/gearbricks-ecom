@@ -10,6 +10,8 @@ import SpinboxWrapper from "@/components/wrapper/SpinboxWrapper";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Blindbox as BlindboxType } from "@/types/global";
 import { useState } from "react";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 // Nhúng luôn kiểu cho stats tại chỗ
 interface MysteryBoxDetailProps {
     blindbox: BlindboxType;
@@ -23,7 +25,22 @@ export default function MysteryBoxDetail({
     blindbox,
     stats,
 }: MysteryBoxDetailProps) {
+    const { addToCart } = useCart();
     const [showRate, setShowRate] = useState(false);
+    const [quantity, setQuantity] = useState(1);
+
+    const handleAddToCart = () => {
+        addToCart({
+            id: blindbox._id,
+            type: 'blindbox',
+            name: blindbox.title,
+            price: blindbox.price,
+            image: blindbox.thumbnailUrl,
+            quantity: quantity
+        });
+
+        toast.success('Đã thêm vào giỏ hàng');
+    };
 
     return (
         <div>
@@ -112,9 +129,21 @@ export default function MysteryBoxDetail({
                         </div>
                         <SpinboxWrapper />
                         <div className="flex items-center gap-4">
-                            <QuantityCounter />
-                            <Button size="lg" className="cursor-pointer">Thêm vào giỏ</Button>
-                            <Button variant="secondary" size="lg" className="cursor-pointer">Thanh toán ngay</Button>
+                            <QuantityCounter value={quantity} onChange={setQuantity} />
+                            <Button
+                                size="lg"
+                                className="text-base px-6 py-4 cursor-pointer"
+                                onClick={handleAddToCart}
+                            >
+                                Thêm vào giỏ
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                size="lg"
+                                className="text-base px-6 py-4 cursor-pointer"
+                            >
+                                Mua bằng VNPAY
+                            </Button>
                         </div>
                     </div>
                     <div className="mt-6 text-sm text-gray-600 leading-relaxed space-y-3">
