@@ -106,3 +106,8 @@ interface AddToCartPayload {
   image: string;
   quantity?: number;
 }
+
+export type SpinResponse = {
+  prizeIndex: number;
+  prizeProduct: Product;
+};

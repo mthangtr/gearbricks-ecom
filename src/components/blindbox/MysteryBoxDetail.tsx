@@ -127,7 +127,7 @@ export default function MysteryBoxDetail({
                                 Mua thêm lượt quay ({blindbox.price.toLocaleString()}₫)
                             </Button>
                         </div>
-                        <SpinboxWrapper />
+                        <SpinboxWrapper blindboxId={blindbox._id} products={blindbox.products.map(({ product }) => product)} />
                         <div className="flex items-center gap-4">
                             <QuantityCounter value={quantity} onChange={setQuantity} />
                             <Button

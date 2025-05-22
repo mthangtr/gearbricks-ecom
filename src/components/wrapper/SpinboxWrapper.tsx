@@ -3,8 +3,14 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import SpinBox from '@/components/SpinBox';
 import { X } from 'lucide-react';
+import type { Product } from '@/types/global';
 
-function SpinboxWrapper() {
+interface SpinboxWrapperProps {
+    blindboxId: string;
+    products: Product[];
+}
+
+function SpinboxWrapper({ blindboxId, products }: SpinboxWrapperProps) {
     const [showSpin, setShowSpin] = useState(false);
 
     const visibleItems = 5;
@@ -16,13 +22,14 @@ function SpinboxWrapper() {
         <>
             <Button variant="default" size="lg" className="w-full cursor-pointer
                             text-base bg-red-600 hover:bg-red-700"
-                onClick={() => setShowSpin(true)}>
-                Quay
+                onClick={() => setShowSpin(true)}
+                disabled={!products?.length}>
+                {!products?.length ? 'Đang tải...' : 'Quay'}
             </Button>
             {showSpin && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
                     <div className={`relative p-6 animate-scaleIn`} style={{ width: `${containerWidth}px` }}>
-                        <SpinBox />
+                        <SpinBox products={products} blindboxId={blindboxId} />
                     </div>
                     <Button
                         size="icon"
