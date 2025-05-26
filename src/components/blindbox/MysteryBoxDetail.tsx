@@ -6,28 +6,32 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Gift, PartyPopper } from "lucide-react";
 import QuantityCounter from "@/components/QuantityCounter";
-import SpinboxWrapper from "@/components/wrapper/SpinboxWrapper";
+import SpinboxWrapper from "@/components/blindbox/SpinboxWrapper";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Blindbox as BlindboxType } from "@/types/global";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-// Nhúng luôn kiểu cho stats tại chỗ
+
 interface MysteryBoxDetailProps {
     blindbox: BlindboxType;
-    stats: {
-        totalSpins: number;
-        winCounts: Record<string, number>;
-    };
+    isAuthenticated: boolean;
+    blindboxSpinCount: number;
 }
 
 export default function MysteryBoxDetail({
     blindbox,
-    stats,
+    isAuthenticated,
+    blindboxSpinCount
 }: MysteryBoxDetailProps) {
     const { addToCart } = useCart();
     const [showRate, setShowRate] = useState(false);
     const [quantity, setQuantity] = useState(1);
+    const [spinCount, setSpinCount] = useState(blindboxSpinCount);
+
+    useEffect(() => {
+        setSpinCount(blindboxSpinCount);
+    }, [blindboxSpinCount]);
 
     const handleAddToCart = () => {
         addToCart({
@@ -64,7 +68,7 @@ export default function MysteryBoxDetail({
                     </h1>
                     <div className="flex items-center justify-between">
                         <p className="text-sm text-gray-500 mt-1">
-                            Đã có {blindbox.totalOpens.toLocaleString()} lượt mở
+                            Đã có 100 lượt mở
                         </p>
 
                         {/* Container tương đối để định vị popup */}
@@ -119,15 +123,15 @@ export default function MysteryBoxDetail({
 
                     {/* Actions */}
                     <div className="mt-6 space-y-6">
-                        <div className="flex items-center justify-between">
+                        {isAuthenticated && <div className="flex items-center justify-between">
                             <span className="font-medium text-gray-500">
-                                Lượt quay: {stats.totalSpins}
+                                Lượt quay: {spinCount}
                             </span>
                             <Button variant="link" className="text-sm text-gray-500 cursor-pointer">
                                 Mua thêm lượt quay ({blindbox.price.toLocaleString()}₫)
                             </Button>
-                        </div>
-                        <SpinboxWrapper blindboxId={blindbox._id} products={blindbox.products.map(({ product }) => product)} />
+                        </div>}
+                        <SpinboxWrapper blindboxId={blindbox._id} products={blindbox.products.map(({ product }) => product)} isAuthenticated={isAuthenticated} />
                         <div className="flex items-center gap-4">
                             <QuantityCounter value={quantity} onChange={setQuantity} />
                             <Button

@@ -48,6 +48,7 @@ export type User = {
   createdAt?: string;
   updatedAt?: string;
   isAdmin?: boolean;
+  blindbBoxSpinCount?: number;
 };
 
 export type Order = {
@@ -83,14 +84,12 @@ export type SpinRecord = {
   createdAt: string;
 };
 
-// Cart Types
-interface CartItem {
-  id: string;
-  type: "product" | "blindbox";
-  name: string;
-  price: number;
+export interface CartItem {
+  product: string | Product;
+  blindbox?: string;
   quantity: number;
-  image: string;
+  price: number;
+  type: "product" | "blindboxProduct";
 }
 
 interface Cart {

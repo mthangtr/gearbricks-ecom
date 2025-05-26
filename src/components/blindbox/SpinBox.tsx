@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { PartyPopper } from 'lucide-react';
 import type { SpinResponse, Product } from '@/types/global';
-
+import { toast } from 'sonner';
 interface SpinBoxProps {
     products?: Product[];
     blindboxId: string;
@@ -51,30 +51,39 @@ export default function SpinBox({ products = [], blindboxId }: SpinBoxProps) {
         setPrizeUrl(null);
         setOffset(0);
 
-        // Start API call
-        const { prizeIndex, prizeProduct } = await fetch('/api/blindbox/spin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ blindboxId })
-        }).then(res => {
-            if (!res.ok) throw new Error('Spin failed');
-            return res.json() as Promise<SpinResponse>;
-        });
+        try {
+            const res = await fetch('/api/blindbox/spin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ blindboxId })
+            });
 
-        const mid = Math.floor(items.length / 2);
-        const targetIndex = mid + prizeIndex;
-        const step = ITEM_SIZE + GAP;
-        const targetOffset = step * (targetIndex - centerSlot);
+            if (!res.ok) {
+                const err = await res.json();
+                toast.error(err.message || 'Có lỗi xảy ra khi quay');
+                setSpinning(false);
+                return;
+            }
 
-        setTimeout(() => {
-            setAnimate(true);
-            setOffset(targetOffset);
-        }, 50);
-        setTimeout(() => {
-            setPrizeUrl(prizeProduct.images?.[0]?.url || '/placeholder.png');
-            setShowDialog(true);
+            const { prizeIndex, prizeProduct }: SpinResponse = await res.json();
+            const mid = Math.floor(items.length / 2);
+            const targetIndex = mid + prizeIndex;
+            const step = ITEM_SIZE + GAP;
+            const targetOffset = step * (targetIndex - centerSlot);
+
+            setTimeout(() => {
+                setAnimate(true);
+                setOffset(targetOffset);
+            }, 50);
+            setTimeout(() => {
+                setPrizeUrl(prizeProduct.images?.[0]?.url || '/placeholder.png');
+                setShowDialog(true);
+                setSpinning(false);
+            }, SPIN_DURATION + 50);
+        } catch (error) {
+            console.error(error);
             setSpinning(false);
-        }, SPIN_DURATION + 50);
+        }
     };
 
     return (

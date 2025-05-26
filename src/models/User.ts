@@ -17,7 +17,7 @@ export interface IUser extends Document {
     zip: string;
   };
   isAdmin?: boolean;
-  blindbBoxSpinCount?: number;
+  blindboxSpinCount: number;
   comparePassword(candidate: string): Promise<boolean>;
 }
 
@@ -37,7 +37,7 @@ const UserSchema = new Schema<IUser>(
       zip: String,
     },
     isAdmin: { type: Boolean, default: false },
-    blindbBoxSpinCount: { type: Number, default: 0 },
+    blindboxSpinCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

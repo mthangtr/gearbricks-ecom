@@ -5,10 +5,8 @@ import GoogleProvider from "next-auth/providers/google";
 import { connectDB } from "@/lib/mongoose";
 import { User, IUser } from "@/models/User";
 import type { NextAuthOptions } from "next-auth";
-import type { Session } from "next-auth";
 import bcrypt from "bcrypt";
 
-// Extend the Session user type to include _id
 declare module "next-auth" {
   interface Session {
     user?: {
@@ -17,6 +15,7 @@ declare module "next-auth" {
       image?: string | null;
       _id?: string;
       isAdmin?: boolean;
+      blindboxSpinCount?: number;
     };
   }
 }
@@ -48,6 +47,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           email: user.email,
           isAdmin: user.isAdmin,
+          blindboxSpinCount: user.blindboxSpinCount,
         };
       },
     }),
@@ -57,7 +57,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    // 2. Upsert Google user và gán user.id để jwt callback xài
     async signIn({ user, account }) {
       if (account && account.provider === "google" && user.email) {
         let dbUser = await User.findOne({ email: user.email });
@@ -69,22 +68,28 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             password: bcryptRandomPassword,
             isAdmin: false,
+            blindboxSpinCount: 0,
           });
         }
         user.name = dbUser.name;
-        (user as any).id = dbUser._id.toString();
+        (user as unknown as { id: string }).id = dbUser._id.toString();
       }
       return true;
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = (user as any).id;
-        token.name = (user as any).name;
-        token.isAdmin = (user as any).isAdmin ?? false;
+        token.id = (user as unknown as { id: string }).id;
+        token.name = (user as unknown as { name: string }).name;
+        token.isAdmin =
+          (user as unknown as { isAdmin: boolean }).isAdmin ?? false;
+        token.blindboxSpinCount =
+          (user as unknown as { blindboxSpinCount: number })
+            .blindboxSpinCount ?? 0;
       } else if (token.id) {
         await connectDB();
         const dbUser = await User.findById(token.id);
         token.isAdmin = dbUser?.isAdmin ?? false;
+        token.blindboxSpinCount = dbUser?.blindboxSpinCount ?? 0;
       }
       return token;
     },
@@ -93,17 +98,17 @@ export const authOptions: NextAuthOptions = {
         session.user._id = token.id as string;
         session.user.name = token.name as string;
         session.user.isAdmin = token.isAdmin as boolean;
+        session.user.blindboxSpinCount = token.blindboxSpinCount as number;
       }
       return session;
     },
   },
   pages: {
-    signIn: "/login", // hoặc `/vi/login` nếu bạn dùng locale
-    error: "/login", // redirect khi có error
+    signIn: "/login",
+    error: "/login",
   },
 };
 
-// 3. Xuất handler cho App Router (Edge hoặc Node)
-export const runtime = "nodejs"; // hoặc omit nếu muốn nodejs
+export const runtime = "nodejs";
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };

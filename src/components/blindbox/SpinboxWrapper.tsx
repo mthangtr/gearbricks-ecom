@@ -1,16 +1,18 @@
 "use client";
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import SpinBox from '@/components/SpinBox';
+import SpinBox from '@/components/blindbox/SpinBox';
 import { X } from 'lucide-react';
 import type { Product } from '@/types/global';
+import Link from 'next/link';
 
 interface SpinboxWrapperProps {
     blindboxId: string;
     products: Product[];
+    isAuthenticated: boolean;
 }
 
-function SpinboxWrapper({ blindboxId, products }: SpinboxWrapperProps) {
+function SpinboxWrapper({ blindboxId, products, isAuthenticated }: SpinboxWrapperProps) {
     const [showSpin, setShowSpin] = useState(false);
 
     const visibleItems = 5;
@@ -20,12 +22,21 @@ function SpinboxWrapper({ blindboxId, products }: SpinboxWrapperProps) {
 
     return (
         <>
-            <Button variant="default" size="lg" className="w-full cursor-pointer
+            {isAuthenticated ? (
+                <Button variant="default" size="lg" className="w-full cursor-pointer
                             text-base bg-red-600 hover:bg-red-700"
-                onClick={() => setShowSpin(true)}
-                disabled={!products?.length}>
-                {!products?.length ? 'Đang tải...' : 'Quay'}
-            </Button>
+                    onClick={() => setShowSpin(true)}
+                    disabled={!products?.length}>
+                    {!products?.length ? 'Đang tải...' : 'Quay'}
+                </Button>) : (
+                <Link href="/login" >
+                    <Button variant="default" size="lg" className="w-full cursor-pointer
+                            text-base bg-red-600 hover:bg-red-700 mb-4"
+                    >
+                        Đăng nhập để quay
+                    </Button>
+                </Link>
+            )}
             {showSpin && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
                     <div className={`relative p-6 animate-scaleIn`} style={{ width: `${containerWidth}px` }}>

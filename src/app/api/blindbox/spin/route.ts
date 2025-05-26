@@ -6,6 +6,7 @@ import { SpinRecord } from "@/models/spinRecord";
 import { getServerSession } from "next-auth";
 import type { Product } from "@/types/global";
 import { User } from "@/models/User";
+import { IUser } from "@/models/User";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,9 +18,19 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     // Get or create user
-    const user = await User.findOne({ email: session.user.email });
+    const user: IUser | null = await User.findOne({
+      email: session.user.email,
+    });
+
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    if (user.blindboxSpinCount <= 0) {
+      return NextResponse.json(
+        { message: "You have no more spins" },
+        { status: 400 }
+      );
     }
 
     const { blindboxId } = await req.json();
@@ -82,6 +93,10 @@ export async function POST(req: NextRequest) {
         blindbox: blindboxId,
         product: selectedProduct!._id,
         success: true,
+      });
+
+      await User.findByIdAndUpdate(user._id, {
+        $inc: { blindboxSpinCount: -1 },
       });
     } catch (dbError) {
       console.error("Failed to create spin record:", dbError);
