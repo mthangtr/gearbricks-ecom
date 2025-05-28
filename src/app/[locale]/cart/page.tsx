@@ -15,6 +15,20 @@ export default function CartPage() {
         router.push('/checkout');
     };
 
+    const getProductId = (item: CartItemType): string => {
+        if (typeof item.product === 'string') {
+            return item.product;
+        }
+        if (typeof item.blindbox === 'string') {
+            return item.blindbox;
+        }
+        return item._id || '';
+    };
+
+    const getItemType = (type: 'product' | 'blindboxProduct' | 'blindbox'): 'product' | 'blindbox' => {
+        return type === 'blindboxProduct' ? 'product' : 'blindbox';
+    };
+
     return (
         <div className='space-y-6'>
             <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
@@ -24,17 +38,21 @@ export default function CartPage() {
             {cart.items.length === 0 ? (
                 <p className="text-gray-500">Không có sản phẩm nào trong giỏ hàng.</p>
             ) : (
-                <>
-                    {cart.items.map((item: CartItemType) => (
-                        <CartItem
-                            key={`${item.type}-${item.id}`}
-                            product={item}
-                            onQuantityChange={(qty) => updateCartItem(item.id, item.type, qty)}
-                            onRemove={() => removeFromCart(item.id, item.type)}
-                        />
-                    ))}
+                <div className="space-y-4">
+                    {cart.items.map((item: CartItemType) => {
+                        const productId = getProductId(item);
+                        const itemType = getItemType(item.type);
+                        return (
+                            <CartItem
+                                key={item._id}
+                                product={item}
+                                onQuantityChange={(qty) => updateCartItem(productId, itemType, qty)}
+                                onRemove={() => removeFromCart(productId, itemType)}
+                            />
+                        );
+                    })}
                     <CartSummary total={cart.totalPrice} onCheckout={handleCheckout} />
-                </>
+                </div>
             )}
         </div>
     );

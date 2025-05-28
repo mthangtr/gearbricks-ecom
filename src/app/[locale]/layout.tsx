@@ -10,7 +10,7 @@ import NextTopLoader from 'nextjs-toploader';
 import { SessionClientProvider } from '../../components/provider/SessionProvider';
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from '@/contexts/CartContext';
-
+import { CircleCheck, AlertTriangle, XCircle, Info } from "lucide-react";
 import "@/app/globals.css";
 
 const geistSans = Geist({
@@ -57,7 +57,14 @@ export default async function LocaleLayout({
                             <main className='max-w-7xl mx-auto px-4 py-8 min-h-screen'>
                                 {children}
                             </main>
-                            <Toaster />
+                            <Toaster
+                                icons={{
+                                    success: <CircleCheck className='text-green-500' />,
+                                    error: <XCircle className='text-red-500' />,
+                                    warning: <AlertTriangle className='text-orange-500' />,
+                                    info: <Info className='text-blue-500' />,
+                                }}
+                            />
                             <Footer />
                         </CartProvider>
                     </SessionClientProvider>

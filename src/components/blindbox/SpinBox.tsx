@@ -9,9 +9,10 @@ import { toast } from 'sonner';
 interface SpinBoxProps {
     products?: Product[];
     blindboxId: string;
+    onSpinComplete?: () => void;
 }
 
-export default function SpinBox({ products = [], blindboxId }: SpinBoxProps) {
+export default function SpinBox({ products = [], blindboxId, onSpinComplete }: SpinBoxProps) {
     const ITEM_SIZE = 130;
     const GAP = 8;
     const PAD = 16;
@@ -79,6 +80,7 @@ export default function SpinBox({ products = [], blindboxId }: SpinBoxProps) {
                 setPrizeUrl(prizeProduct.images?.[0]?.url || '/placeholder.png');
                 setShowDialog(true);
                 setSpinning(false);
+                onSpinComplete?.();
             }, SPIN_DURATION + 50);
         } catch (error) {
             console.error(error);

@@ -1,3 +1,4 @@
+import { Product } from "./../models/Product";
 export type ImageItem = {
   url: string;
   index: number;
@@ -85,25 +86,19 @@ export type SpinRecord = {
 };
 
 export interface CartItem {
-  product: string | Product;
-  blindbox?: string;
+  _id?: string;
+  productId?: string | Product;
+  blindboxId?: string | Blindbox;
+  thumbnailUrl?: string;
+  name?: string;
   quantity: number;
   price: number;
-  type: "product" | "blindboxProduct";
+  type: "product" | "blindboxProduct" | "blindbox";
 }
 
 interface Cart {
   items: CartItem[];
   totalPrice: number;
-}
-
-interface AddToCartPayload {
-  id: string;
-  type: "product" | "blindbox";
-  name: string;
-  price: number;
-  image: string;
-  quantity?: number;
 }
 
 export type SpinResponse = {

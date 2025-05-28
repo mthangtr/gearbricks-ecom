@@ -9,10 +9,10 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
-  const { slug } = params;
+  const { slug } = await params;
 
   const blindbox = await Blindbox.findOne({ slug })
-    .populate("products.product", "name images price") // <- Lấy thông tin sản phẩm đầy đủ
+    .populate("products.product", "name images price")
     .lean();
 
   if (!blindbox) {

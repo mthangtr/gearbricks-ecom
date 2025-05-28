@@ -1,6 +1,35 @@
-import { Cart, CartItem, AddToCartPayload } from "@/types/cart";
+import { Cart, CartItem } from "@/types/global";
 
 const CART_STORAGE_KEY = "cart";
+
+function getCartItemId(item: CartItem): string {
+  if (typeof item.productId === "string") {
+    return item.productId;
+  }
+  if (typeof item.blindboxId === "string") {
+    return item.blindboxId;
+  }
+  if (typeof item.productId === "object" && item.productId?._id) {
+    return item.productId._id;
+  }
+  if (typeof item.blindboxId === "object" && item.blindboxId?._id) {
+    return item.blindboxId._id;
+  }
+  return item._id || "";
+}
+
+function getProductIdByType(item: CartItem): string {
+  switch (item.type) {
+    case "product":
+      return getCartItemId(item);
+    case "blindbox":
+      return getCartItemId(item);
+    case "blindboxProduct":
+      return getCartItemId(item);
+    default:
+      return "";
+  }
+}
 
 export const cartService = {
   getCart: (): Cart => {
@@ -11,36 +40,51 @@ export const cartService = {
     return cartData ? JSON.parse(cartData) : { items: [], totalPrice: 0 };
   },
 
-  addToCart: (payload: AddToCartPayload): Cart => {
-    const cart = cartService.getCart();
-    const existingItemIndex = cart.items.findIndex(
-      (item) => item.id === payload.id && item.type === payload.type
-    );
+  saveCart: (cart: Cart): Cart => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    }
+    return cart;
+  },
 
-    if (existingItemIndex > -1) {
-      // Update existing item
-      cart.items[existingItemIndex].quantity += payload.quantity || 1;
+  addToCart: (payload: CartItem): Cart => {
+    const cart = cartService.getCart();
+
+    // Lấy ID của sản phẩm mới
+    const newItemId = getProductIdByType(payload);
+
+    // Kiểm tra sản phẩm trùng lặp dựa trên type và ID
+    const existingIndex = cart.items.findIndex((item) => {
+      if (!item) return false;
+      const itemId = getCartItemId(item);
+      return itemId === newItemId && item.type === payload.type;
+    });
+
+    if (existingIndex > -1) {
+      // Nếu sản phẩm đã tồn tại và không phải blindboxProduct, tăng số lượng
+      if (payload.type !== "blindboxProduct") {
+        cart.items[existingIndex].quantity += payload.quantity || 1;
+      }
     } else {
-      // Add new item
+      // Nếu sản phẩm chưa tồn tại, thêm mới
       const newItem: CartItem = {
-        id: payload.id,
+        productId: payload.type !== "blindbox" ? newItemId : undefined,
+        blindboxId: payload.type === "blindbox" ? newItemId : undefined,
         type: payload.type,
-        name: payload.name,
-        price: payload.price,
         quantity: payload.quantity || 1,
-        image: payload.image,
+        price: payload.price,
+        name: payload.name,
+        thumbnailUrl: payload.thumbnailUrl,
       };
       cart.items.push(newItem);
     }
 
-    // Recalculate total price
+    // Tính lại tổng giá
     cart.totalPrice = cart.items.reduce(
-      (total, item) => total + item.price * item.quantity,
+      (sum, i) => sum + i.price * i.quantity,
       0
     );
-
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-    return cart;
+    return cartService.saveCart(cart);
   },
 
   updateCartItem: (
@@ -49,9 +93,11 @@ export const cartService = {
     quantity: number
   ): Cart => {
     const cart = cartService.getCart();
-    const itemIndex = cart.items.findIndex(
-      (item) => item.id === id && item.type === type
-    );
+    const itemIndex = cart.items.findIndex((item) => {
+      if (!item) return false;
+      const itemId = getCartItemId(item);
+      return itemId === id && item.type === type;
+    });
 
     if (itemIndex > -1) {
       if (quantity <= 0) {
@@ -66,7 +112,7 @@ export const cartService = {
         0
       );
 
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+      return cartService.saveCart(cart);
     }
 
     return cart;
@@ -74,9 +120,11 @@ export const cartService = {
 
   removeFromCart: (id: string, type: "product" | "blindbox"): Cart => {
     const cart = cartService.getCart();
-    cart.items = cart.items.filter(
-      (item) => !(item.id === id && item.type === type)
-    );
+    cart.items = cart.items.filter((item) => {
+      if (!item) return false;
+      const itemId = getCartItemId(item);
+      return !(itemId === id && item.type === type);
+    });
 
     // Recalculate total price
     cart.totalPrice = cart.items.reduce(
@@ -84,13 +132,11 @@ export const cartService = {
       0
     );
 
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-    return cart;
+    return cartService.saveCart(cart);
   },
 
   clearCart: (): Cart => {
     const emptyCart = { items: [], totalPrice: 0 };
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(emptyCart));
-    return emptyCart;
+    return cartService.saveCart(emptyCart);
   },
 };

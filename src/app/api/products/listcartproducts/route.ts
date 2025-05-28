@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { connectDB } from "@/lib/mongoose";
-import { Cart } from "@/models/Cart";
-import { User } from "@/types/global";
-import { User as UserModel } from "@/models/User";
+import { Cart, User as UserModel } from "@/models";
 
 export async function GET() {
   try {
@@ -15,7 +13,7 @@ export async function GET() {
     await connectDB();
 
     // Get or create user
-    const user: User | null = await UserModel.findOne({
+    const user = await UserModel.findOne({
       email: session.user.email,
     });
 

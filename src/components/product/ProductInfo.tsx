@@ -26,11 +26,11 @@ export default function ProductInfo({ product }: { product: Product }) {
         }
 
         addToCart({
-            id: product._id,
+            productId: product._id,
             type: 'product',
             name: product.name,
             price: product.price,
-            image: product.images[0].url,
+            thumbnailUrl: product.images[0].url,
             quantity: quantity
         });
 

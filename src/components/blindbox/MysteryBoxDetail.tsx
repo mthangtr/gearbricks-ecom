@@ -16,30 +16,33 @@ import { toast } from "sonner";
 interface MysteryBoxDetailProps {
     blindbox: BlindboxType;
     isAuthenticated: boolean;
-    blindboxSpinCount: number;
 }
 
 export default function MysteryBoxDetail({
     blindbox,
     isAuthenticated,
-    blindboxSpinCount
 }: MysteryBoxDetailProps) {
     const { addToCart } = useCart();
     const [showRate, setShowRate] = useState(false);
     const [quantity, setQuantity] = useState(1);
-    const [spinCount, setSpinCount] = useState(blindboxSpinCount);
+    const [spinCount, setSpinCount] = useState(0);
 
     useEffect(() => {
-        setSpinCount(blindboxSpinCount);
-    }, [blindboxSpinCount]);
+        const fetchSpinCount = async () => {
+            const response = await fetch("/api/blindbox/get-spin-count");
+            const data = await response.json();
+            setSpinCount(data.spinCount);
+        };
+        fetchSpinCount();
+    }, []);
 
     const handleAddToCart = () => {
         addToCart({
-            id: blindbox._id,
+            blindboxId: blindbox._id,
             type: 'blindbox',
             name: blindbox.title,
             price: blindbox.price,
-            image: blindbox.thumbnailUrl,
+            thumbnailUrl: blindbox.thumbnailUrl,
             quantity: quantity
         });
 
@@ -131,7 +134,17 @@ export default function MysteryBoxDetail({
                                 Mua thêm lượt quay ({blindbox.price.toLocaleString()}₫)
                             </Button>
                         </div>}
-                        <SpinboxWrapper blindboxId={blindbox._id} products={blindbox.products.map(({ product }) => product)} isAuthenticated={isAuthenticated} />
+                        <SpinboxWrapper
+                            blindboxId={blindbox._id}
+                            products={blindbox.products.map(({ product }) => product)}
+                            isAuthenticated={isAuthenticated}
+                            spinCount={spinCount}
+                            onSpinComplete={() => {
+                                fetch("/api/blindbox/get-spin-count")
+                                    .then((res) => res.json())
+                                    .then((data) => setSpinCount(data.spinCount));
+                            }}
+                        />
                         <div className="flex items-center gap-4">
                             <QuantityCounter value={quantity} onChange={setQuantity} />
                             <Button

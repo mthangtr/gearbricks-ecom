@@ -15,10 +15,8 @@ export default async function MysteryBoxSSRPage({
     const session = await getServerSession(authOptions);
 
     let isAuthenticated = false;
-    let blindboxSpinCount = 0;
     if (session) {
         isAuthenticated = true;
-        blindboxSpinCount = session.user?.blindboxSpinCount ?? 0;
     }
 
     const baseUrl =
@@ -37,5 +35,5 @@ export default async function MysteryBoxSSRPage({
     const blindbox: Blindbox = await res.json();
 
     // 3) Render client-component với props đã fetch sẵn
-    return <MysteryBoxDetail blindbox={blindbox} isAuthenticated={isAuthenticated} blindboxSpinCount={blindboxSpinCount} />;
+    return <MysteryBoxDetail blindbox={blindbox} isAuthenticated={isAuthenticated} />;
 }

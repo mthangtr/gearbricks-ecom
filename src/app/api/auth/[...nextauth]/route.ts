@@ -15,7 +15,6 @@ declare module "next-auth" {
       image?: string | null;
       _id?: string;
       isAdmin?: boolean;
-      blindboxSpinCount?: number;
     };
   }
 }
@@ -47,7 +46,6 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           email: user.email,
           isAdmin: user.isAdmin,
-          blindboxSpinCount: user.blindboxSpinCount,
         };
       },
     }),
@@ -68,7 +66,6 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             password: bcryptRandomPassword,
             isAdmin: false,
-            blindboxSpinCount: 0,
           });
         }
         user.name = dbUser.name;
@@ -89,7 +86,6 @@ export const authOptions: NextAuthOptions = {
         await connectDB();
         const dbUser = await User.findById(token.id);
         token.isAdmin = dbUser?.isAdmin ?? false;
-        token.blindboxSpinCount = dbUser?.blindboxSpinCount ?? 0;
       }
       return token;
     },
@@ -98,7 +94,6 @@ export const authOptions: NextAuthOptions = {
         session.user._id = token.id as string;
         session.user.name = token.name as string;
         session.user.isAdmin = token.isAdmin as boolean;
-        session.user.blindboxSpinCount = token.blindboxSpinCount as number;
       }
       return session;
     },
