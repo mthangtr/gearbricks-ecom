@@ -12,10 +12,12 @@ interface CartItemProps {
 
 export default function CartItem({ product, onQuantityChange, onRemove }: CartItemProps) {
 
-
     const getItemType = (type: 'product' | 'blindboxProduct' | 'blindbox'): string => {
         return type === 'blindboxProduct' ? 'Award Product' : type === 'blindbox' ? 'Mystery Box' : 'Product';
     }
+
+    // Kiểm tra xem có phải blindboxProduct không
+    const isBlindboxProduct = product?.type === 'blindboxProduct';
 
     return (
         <div className="flex items-center gap-4 p-4 border rounded-lg">
@@ -37,27 +39,46 @@ export default function CartItem({ product, onQuantityChange, onRemove }: CartIt
                 </div>
                 <p className="text-gray-600">{product?.price.toLocaleString('vi-VN')}đ</p>
             </div>
+
+            {/* Hiển thị số lượng - khác nhau cho blindboxProduct */}
             <div className="flex items-center gap-2">
-                <button
-                    onClick={() => onQuantityChange((product?.quantity ?? 0) - 1)}
-                    className="p-1 hover:bg-gray-100 rounded"
-                >
-                    <Minus size={16} />
-                </button>
-                <span className="w-8 text-center">{product?.quantity}</span>
-                <button
-                    onClick={() => onQuantityChange((product?.quantity ?? 0) + 1)}
-                    className="p-1 hover:bg-gray-100 rounded"
-                >
-                    <Plus size={16} />
-                </button>
+                {isBlindboxProduct ? (
+                    // Đối với blindboxProduct, chỉ hiển thị số lượng
+                    <div className="flex flex-col items-center">
+                        <span className="w-8 text-center font-medium text-gray-700">
+                            {product?.quantity}
+                        </span>
+                        <span className="text-xs text-gray-500 mt-1">Không thể chỉnh sửa</span>
+                    </div>
+                ) : (
+                    // Đối với sản phẩm thường, hiển thị nút tăng giảm
+                    <>
+                        <button
+                            onClick={() => onQuantityChange((product?.quantity ?? 0) - 1)}
+                            className="p-1 hover:bg-gray-100 rounded"
+                        >
+                            <Minus size={16} />
+                        </button>
+                        <span className="w-8 text-center">{product?.quantity}</span>
+                        <button
+                            onClick={() => onQuantityChange((product?.quantity ?? 0) + 1)}
+                            className="p-1 hover:bg-gray-100 rounded"
+                        >
+                            <Plus size={16} />
+                        </button>
+                    </>
+                )}
             </div>
-            <button
-                onClick={onRemove}
-                className="p-2 text-red-500 hover:bg-red-50 rounded"
-            >
-                <Trash2 size={20} />
-            </button>
+
+            {/* Nút xóa - ẩn cho blindboxProduct */}
+            {!isBlindboxProduct && (
+                <button
+                    onClick={onRemove}
+                    className="p-2 text-red-500 hover:bg-red-50 rounded"
+                >
+                    <Trash2 size={20} />
+                </button>
+            )}
         </div>
     );
 }

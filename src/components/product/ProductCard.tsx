@@ -5,7 +5,7 @@ import { Product } from "@/types/global";
 
 export default function ProductCard({ product }: { product: Product }) {
     return (
-        <Card className="hover:shadow-lg transition-all overflow-hidden">
+        <div className="hover:shadow-lg transition-all overflow-hidden border-2 rounded-2xl">
             <Link href={`/product/${product.slug}`} className="block">
                 <div className="relative w-full aspect-[4/3]">
                     <Image
@@ -18,16 +18,16 @@ export default function ProductCard({ product }: { product: Product }) {
                     />
                 </div>
             </Link>
-            <CardContent className="">
+            <div className="p-4">
                 <Link href={`/product/${product.slug}`}>
-                    <CardTitle className="text-base font-semibold truncate hover:underline">
+                    <div className="text-base font-semibold truncate hover:underline">
                         {product.name}
-                    </CardTitle>
+                    </div>
                 </Link>
                 <p className="text-sm text-muted-foreground">
                     {product.price.toLocaleString()} ₫
                 </p>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }

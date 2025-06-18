@@ -17,8 +17,22 @@ Let's do a check if the user is authenticated, if not, we need to return a error
 */
 
 export async function POST(request: NextRequest) {
-  const { productId, blindboxId, quantity, type, thumbnailUrl, name, price } =
-    await request.json();
+  const payload = await request.json();
+  console.log("Received payload:", payload);
+
+  // Xử lý cả trường hợp productId/blindboxId và product/blindbox
+  const productId = payload.productId || payload.product;
+  const blindboxId = payload.blindboxId || payload.blindbox;
+  const {
+    quantity,
+    type,
+    thumbnailUrl,
+    name,
+    price,
+    originalBlindboxId,
+    originalProductId,
+    originalProductSlug,
+  } = payload;
 
   console.log("productId", productId);
   console.log("blindboxId", blindboxId);
@@ -27,6 +41,9 @@ export async function POST(request: NextRequest) {
   console.log("thumbnailUrl", thumbnailUrl);
   console.log("name", name);
   console.log("price", price);
+  console.log("originalBlindboxId", originalBlindboxId);
+  console.log("originalProductId", originalProductId);
+  console.log("originalProductSlug", originalProductSlug);
 
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
@@ -46,7 +63,12 @@ export async function POST(request: NextRequest) {
       quantity: quantity || 1,
       price: type === "blindboxProduct" ? 0 : price,
       type,
+      originalBlindboxId,
+      originalProductId,
+      originalProductSlug,
     };
+
+    console.log("Creating new item:", newItem);
 
     if (!cart) {
       cart = await Cart.create({
@@ -54,12 +76,13 @@ export async function POST(request: NextRequest) {
         items: [newItem],
         totalPrice: 0,
       });
+      console.log("Created new cart:", cart);
     } else {
       // Kiểm tra sản phẩm trùng lặp dựa trên type và product._id
       const existingItemIndex = cart.items.findIndex((item) => {
         if (!item) return false;
 
-        console.log("item", item);
+        console.log("Checking item:", item);
 
         // Lấy ID từ product hoặc blindbox object
         const itemProductId =
@@ -84,6 +107,7 @@ export async function POST(request: NextRequest) {
             itemBlindboxId === blindboxId?.toString()
           );
         } else if (type === "blindboxProduct") {
+          // Đối với blindboxProduct, chỉ tăng số lượng nếu cùng type
           return (
             item.type === "blindboxProduct" &&
             itemProductId === productId?.toString()
@@ -92,13 +116,27 @@ export async function POST(request: NextRequest) {
         return false;
       });
 
+      console.log("Existing item index:", existingItemIndex);
+
       if (existingItemIndex > -1) {
-        // Chỉ tăng số lượng nếu không phải blindboxProduct
-        if (type !== "blindboxProduct") {
+        // Chỉ tăng số lượng nếu cùng type
+        const existingItem = cart.items[existingItemIndex];
+        if (existingItem.type === type) {
           cart.items[existingItemIndex].quantity += quantity || 1;
+          console.log(
+            "Updated existing item quantity:",
+            cart.items[existingItemIndex]
+          );
+        } else {
+          // Không cho phép thêm sản phẩm khác type vào giỏ hàng
+          return NextResponse.json(
+            { error: "Không thể thêm sản phẩm khác loại vào giỏ hàng" },
+            { status: 400 }
+          );
         }
       } else {
         cart.items.push(newItem);
+        console.log("Added new item to cart");
       }
 
       // Tính lại tổng giá
@@ -106,6 +144,8 @@ export async function POST(request: NextRequest) {
         (total, item) => total + item.price * item.quantity,
         0
       );
+
+      console.log("Updated cart total price:", cart.totalPrice);
 
       await cart.save();
     }

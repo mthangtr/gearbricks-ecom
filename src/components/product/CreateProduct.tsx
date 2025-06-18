@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import Image from "next/image"
-import { ImageItem, Category } from "@/types/global"
+import { ImageItem, Category, Product } from "@/types/global"
 import {
     Select,
     SelectTrigger,
@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { toast } from "sonner"
 
-export default function CreateProduct() {
+export default function CreateProduct({ onSuccess }: { onSuccess: (product: Product) => void }) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [images, setImages] = useState<ImageItem[]>([])

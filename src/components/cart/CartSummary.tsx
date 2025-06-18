@@ -8,6 +8,7 @@ type CartSummaryProps = {
 };
 
 export default function CartSummary({ total, onCheckout }: CartSummaryProps) {
+    console.log('CartSummary received total:', total);
 
     return (
         <div className="mt-8 border-t pt-4">

@@ -16,17 +16,35 @@ export default function CartPage() {
     };
 
     const getProductId = (item: CartItemType): string => {
-        if (typeof item.product === 'string') {
-            return item.product;
+        // Xử lý product
+        if (item.product) {
+            if (typeof item.product === 'string') {
+                return item.product;
+            }
+            if (typeof item.product === 'object' && item.product._id) {
+                return item.product._id;
+            }
         }
-        if (typeof item.blindbox === 'string') {
-            return item.blindbox;
+
+        // Xử lý blindbox
+        if (item.blindbox) {
+            if (typeof item.blindbox === 'string') {
+                return item.blindbox;
+            }
+            if (typeof item.blindbox === 'object' && item.blindbox._id) {
+                return item.blindbox._id;
+            }
         }
+
+        // Fallback
         return item._id || '';
     };
 
     const getItemType = (type: 'product' | 'blindboxProduct' | 'blindbox'): 'product' | 'blindbox' => {
-        return type === 'blindboxProduct' ? 'product' : 'blindbox';
+        if (type === 'blindboxProduct' || type === 'product') {
+            return 'product';
+        }
+        return 'blindbox';
     };
 
     return (
@@ -42,12 +60,24 @@ export default function CartPage() {
                     {cart.items.map((item: CartItemType) => {
                         const productId = getProductId(item);
                         const itemType = getItemType(item.type);
+                        const isBlindboxProduct = item.type === 'blindboxProduct';
+
                         return (
                             <CartItem
                                 key={item._id}
                                 product={item}
-                                onQuantityChange={(qty) => updateCartItem(productId, itemType, qty)}
-                                onRemove={() => removeFromCart(productId, itemType)}
+                                onQuantityChange={(qty) => {
+                                    // Chỉ cho phép thay đổi số lượng nếu không phải blindboxProduct
+                                    if (!isBlindboxProduct) {
+                                        updateCartItem(productId, itemType, qty);
+                                    }
+                                }}
+                                onRemove={() => {
+                                    // Chỉ cho phép xóa nếu không phải blindboxProduct
+                                    if (!isBlindboxProduct) {
+                                        removeFromCart(productId, itemType);
+                                    }
+                                }}
                             />
                         );
                     })}

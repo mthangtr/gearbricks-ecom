@@ -3,17 +3,17 @@ import { Cart, CartItem } from "@/types/global";
 const CART_STORAGE_KEY = "cart";
 
 function getCartItemId(item: CartItem): string {
-  if (typeof item.productId === "string") {
-    return item.productId;
+  if (typeof item.product === "string") {
+    return item.product;
   }
-  if (typeof item.blindboxId === "string") {
-    return item.blindboxId;
+  if (typeof item.blindbox === "string") {
+    return item.blindbox;
   }
-  if (typeof item.productId === "object" && item.productId?._id) {
-    return item.productId._id;
+  if (typeof item.product === "object" && item.product?._id) {
+    return item.product._id;
   }
-  if (typeof item.blindboxId === "object" && item.blindboxId?._id) {
-    return item.blindboxId._id;
+  if (typeof item.blindbox === "object" && item.blindbox?._id) {
+    return item.blindbox._id;
   }
   return item._id || "";
 }
@@ -68,8 +68,8 @@ export const cartService = {
     } else {
       // Nếu sản phẩm chưa tồn tại, thêm mới
       const newItem: CartItem = {
-        productId: payload.type !== "blindbox" ? newItemId : undefined,
-        blindboxId: payload.type === "blindbox" ? newItemId : undefined,
+        product: payload.type !== "blindbox" ? newItemId : undefined,
+        blindbox: payload.type === "blindbox" ? newItemId : undefined,
         type: payload.type,
         quantity: payload.quantity || 1,
         price: payload.price,
@@ -100,6 +100,13 @@ export const cartService = {
     });
 
     if (itemIndex > -1) {
+      // Kiểm tra xem có phải blindboxProduct không
+      const item = cart.items[itemIndex];
+      if (item.type === "blindboxProduct") {
+        // Không cho phép chỉnh sửa blindboxProduct
+        return cart;
+      }
+
       if (quantity <= 0) {
         cart.items.splice(itemIndex, 1);
       } else {
@@ -122,6 +129,13 @@ export const cartService = {
     const cart = cartService.getCart();
     cart.items = cart.items.filter((item) => {
       if (!item) return false;
+
+      // Kiểm tra xem có phải blindboxProduct không
+      if (item.type === "blindboxProduct") {
+        // Không cho phép xóa blindboxProduct
+        return true; // Giữ lại item
+      }
+
       const itemId = getCartItemId(item);
       return !(itemId === id && item.type === type);
     });

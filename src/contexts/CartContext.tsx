@@ -46,11 +46,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     const response = await fetch('/api/products/listcartproducts');
                     if (response.ok) {
                         const dbCart = await response.json();
+                        console.log('Loaded cart from DB:', dbCart);
                         setCart(dbCart);
                     }
                 } else {
                     // Nếu user chưa login, lấy từ localStorage
                     const localCart = cartService.getCart();
+                    console.log('Loaded cart from localStorage:', localCart);
                     setCart(localCart);
                 }
             } catch (error) {
@@ -65,6 +67,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }, [session]);
 
     const addToCart = async (payload: CartItem) => {
+        console.log('Adding to cart:', payload);
         if (session?.user?.email) {
             // Nếu đã login, thêm vào DB
             try {
@@ -75,6 +78,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 });
                 if (response.ok) {
                     const updatedCart = await response.json();
+                    console.log('Updated cart after add:', updatedCart);
                     setCart(updatedCart);
                 }
             } catch (error) {
@@ -83,11 +87,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         } else {
             // Nếu chưa login, thêm vào localStorage
             const updatedCart = cartService.addToCart(payload);
+            console.log('Updated cart in localStorage:', updatedCart);
             setCart(updatedCart);
         }
     };
 
     const updateCartItem = async (id: string, type: 'product' | 'blindbox', quantity: number) => {
+        console.log('Updating cart item:', { id, type, quantity });
+
+        // Kiểm tra xem item có phải blindboxProduct không
+        const item = cart.items.find(item => {
+            if (!item) return false;
+            const itemId = typeof item.product === 'string' ? item.product :
+                typeof item.product === 'object' ? item.product?._id :
+                    typeof item.blindbox === 'string' ? item.blindbox :
+                        typeof item.blindbox === 'object' ? item.blindbox?._id : '';
+            return itemId === id && item.type === type;
+        });
+
+        if (item?.type === 'blindboxProduct') {
+            console.log('Cannot update blindboxProduct');
+            return;
+        }
+
         if (session?.user?.email) {
             // Nếu đã login, cập nhật trong DB
             try {
@@ -98,6 +120,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 });
                 if (response.ok) {
                     const updatedCart = await response.json();
+                    console.log('Updated cart after update:', updatedCart);
                     setCart(updatedCart);
                 }
             } catch (error) {
@@ -106,11 +129,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         } else {
             // Nếu chưa login, cập nhật trong localStorage
             const updatedCart = cartService.updateCartItem(id, type, quantity);
+            console.log('Updated cart in localStorage:', updatedCart);
             setCart(updatedCart);
         }
     };
 
     const removeFromCart = async (id: string, type: 'product' | 'blindbox') => {
+        console.log('Removing from cart:', { id, type });
+
+        // Kiểm tra xem item có phải blindboxProduct không
+        const item = cart.items.find(item => {
+            if (!item) return false;
+            const itemId = typeof item.product === 'string' ? item.product :
+                typeof item.product === 'object' ? item.product?._id :
+                    typeof item.blindbox === 'string' ? item.blindbox :
+                        typeof item.blindbox === 'object' ? item.blindbox?._id : '';
+            return itemId === id && item.type === type;
+        });
+
+        if (item?.type === 'blindboxProduct') {
+            console.log('Cannot remove blindboxProduct');
+            return;
+        }
+
         if (session?.user?.email) {
             // Nếu đã login, xóa trong DB
             try {
@@ -121,6 +162,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 });
                 if (response.ok) {
                     const updatedCart = await response.json();
+                    console.log('Updated cart after remove:', updatedCart);
                     setCart(updatedCart);
                 }
             } catch (error) {
@@ -129,6 +171,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         } else {
             // Nếu chưa login, xóa trong localStorage
             const updatedCart = cartService.removeFromCart(id, type);
+            console.log('Updated cart in localStorage:', updatedCart);
             setCart(updatedCart);
         }
     };

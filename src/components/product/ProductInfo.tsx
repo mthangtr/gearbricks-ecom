@@ -26,7 +26,7 @@ export default function ProductInfo({ product }: { product: Product }) {
         }
 
         addToCart({
-            productId: product._id,
+            product: product._id,
             type: 'product',
             name: product.name,
             price: product.price,

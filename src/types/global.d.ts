@@ -87,8 +87,8 @@ export type SpinRecord = {
 
 export interface CartItem {
   _id?: string;
-  productId?: string | Product;
-  blindboxId?: string | Blindbox;
+  product?: string | Product;
+  blindbox?: string | Blindbox;
   thumbnailUrl?: string;
   name?: string;
   quantity: number;

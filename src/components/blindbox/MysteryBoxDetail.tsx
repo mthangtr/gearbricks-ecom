@@ -38,7 +38,7 @@ export default function MysteryBoxDetail({
 
     const handleAddToCart = () => {
         addToCart({
-            blindboxId: blindbox._id,
+            blindbox: blindbox._id,
             type: 'blindbox',
             name: blindbox.title,
             price: blindbox.price,
