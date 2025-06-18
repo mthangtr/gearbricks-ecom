@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/button';
 import { PartyPopper } from 'lucide-react';
 import type { SpinResponse, Product } from '@/types/global';
 import { toast } from 'sonner';
+import { useCart } from '@/contexts/CartContext';
+import { useRouter } from 'next/navigation';
+
 interface SpinBoxProps {
     products?: Product[];
     blindboxId: string;
@@ -25,6 +28,10 @@ export default function SpinBox({ products = [], blindboxId, onSpinComplete }: S
     const [spinning, setSpinning] = useState(false);
     const [prizeUrl, setPrizeUrl] = useState<string | null>(null);
     const [showDialog, setShowDialog] = useState(false);
+    const [wonProduct, setWonProduct] = useState<Product | null>(null);
+
+    const { cart, refreshCart } = useCart();
+    const router = useRouter();
 
     const productImages = products.map(p => p.images?.[0]?.url || '/placeholder.png');
     const items = productImages.length
@@ -50,6 +57,7 @@ export default function SpinBox({ products = [], blindboxId, onSpinComplete }: S
         setAnimate(false);
         setShowDialog(false);
         setPrizeUrl(null);
+        setWonProduct(null);
         setOffset(0);
 
         try {
@@ -78,14 +86,50 @@ export default function SpinBox({ products = [], blindboxId, onSpinComplete }: S
             }, 50);
             setTimeout(() => {
                 setPrizeUrl(prizeProduct.images?.[0]?.url || '/placeholder.png');
+                setWonProduct(prizeProduct);
                 setShowDialog(true);
                 setSpinning(false);
+
+                // Cập nhật spin count
                 onSpinComplete?.();
+
+                // Cập nhật giỏ hàng ngay lập tức
+                refreshCart();
+
+                // Hiển thị thông báo thành công với thông tin chi tiết
+                toast.success(
+                    <div className="flex flex-col gap-2">
+                        <div className="font-semibold text-green-700 flex items-center gap-2">
+                            <span className="text-xl">🎉</span>
+                            Chúc mừng! Bạn đã trúng thưởng!
+                        </div>
+                        <div className="text-sm">
+                            <strong>{prizeProduct.name}</strong> đã được tự động thêm vào giỏ hàng.
+                        </div>
+                        <div className="text-xs text-gray-600 flex items-center gap-1">
+                            <span className="text-green-500">✓</span>
+                            Sản phẩm này miễn phí vì bạn đã trả tiền cho blindbox.
+                        </div>
+                    </div>,
+                    {
+                        duration: 6000,
+                        action: {
+                            label: 'Xem giỏ hàng',
+                            onClick: () => router.push('/cart')
+                        }
+                    }
+                );
             }, SPIN_DURATION + 50);
         } catch (error) {
             console.error(error);
+            toast.error('Có lỗi xảy ra khi quay');
             setSpinning(false);
         }
+    };
+
+    const handleCloseDialog = () => {
+        setShowDialog(false);
+        setWonProduct(null);
     };
 
     return (
@@ -125,24 +169,56 @@ export default function SpinBox({ products = [], blindboxId, onSpinComplete }: S
             >
                 {spinning ? 'Đang quay...' : '🎰 Quay ngay'}
             </Button>
-            {showDialog && prizeUrl && (
+            {showDialog && prizeUrl && wonProduct && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
                     <div className="max-w-md rounded-xl bg-white p-6 shadow-lg animate-scaleIn">
                         <div className="text-center">
-                            <h2 className="mb-4 flex items-center justify-center gap-2 text-xl font-semibold text-green-600">
-                                <PartyPopper className="h-6 w-6" /> Bạn đã trúng!
-                            </h2>
-                            <Image
-                                src={prizeUrl}
-                                alt="Prize"
-                                width={200}
-                                height={200}
-                                className="mx-auto mb-4 rounded-xl shadow"
-                            />
-                            <p className="mb-6 text-sm text-gray-600">Chúc mừng bạn đã quay trúng phần thưởng này!</p>
-                            <Button variant="secondary" onClick={() => setShowDialog(false)} className="px-6 py-2 rounded-md cursor-pointer">
-                                Đóng
-                            </Button>
+                            <div className="mb-4 flex items-center justify-center gap-2 text-xl font-semibold text-green-600">
+                                <PartyPopper className="h-6 w-6" />
+                                <span>Bạn đã trúng!</span>
+                            </div>
+                            <div className="relative mb-4">
+                                <Image
+                                    src={prizeUrl}
+                                    alt="Prize"
+                                    width={200}
+                                    height={200}
+                                    className="mx-auto rounded-xl shadow"
+                                />
+                                <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                                    🎁 Miễn phí
+                                </div>
+                            </div>
+                            <h3 className="mb-2 text-lg font-semibold text-gray-800">{wonProduct.name}</h3>
+                            <p className="mb-4 text-sm text-gray-600">
+                                Chúc mừng bạn đã quay trúng phần thưởng này!
+                                Sản phẩm đã được tự động thêm vào giỏ hàng.
+                            </p>
+                            <div className="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                                <div className="text-xs text-green-700 flex items-center gap-1">
+                                    <span className="text-green-500">✓</span>
+                                    Sản phẩm này miễn phí vì bạn đã trả tiền cho blindbox
+                                </div>
+                            </div>
+                            <div className="flex gap-3 justify-center">
+                                <Button
+                                    variant="secondary"
+                                    onClick={handleCloseDialog}
+                                    className="px-6 py-2 rounded-md cursor-pointer"
+                                >
+                                    Đóng
+                                </Button>
+                                <Button
+                                    variant="default"
+                                    onClick={() => {
+                                        handleCloseDialog();
+                                        router.push('/cart');
+                                    }}
+                                    className="px-6 py-2 rounded-md cursor-pointer bg-blue-600 hover:bg-blue-700"
+                                >
+                                    Xem giỏ hàng
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>

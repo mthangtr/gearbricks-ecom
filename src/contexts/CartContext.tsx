@@ -11,6 +11,7 @@ interface CartContextType {
     updateCartItem: (id: string, type: 'product' | 'blindbox', quantity: number) => void;
     removeFromCart: (id: string, type: 'product' | 'blindbox') => void;
     clearCart: () => void;
+    refreshCart: () => Promise<void>;
     isLoading: boolean;
 }
 
@@ -21,48 +22,63 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const { data: session } = useSession();
 
-    useEffect(() => {
-        const loadCart = async () => {
+    const loadCart = async () => {
+        try {
+            setIsLoading(true);
+            if (session?.user?.email) {
+                // Nếu user đã login
+                const localCart = cartService.getCart();
+
+                // Nếu có sản phẩm trong localStorage, thêm vào DB
+                if (localCart.items.length > 0) {
+                    for (const item of localCart.items) {
+                        await fetch('/api/products/addtocart', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(item),
+                        });
+                    }
+                    // Xóa localStorage sau khi đã thêm vào DB
+                    cartService.clearCart();
+                }
+
+                // Lấy cart từ database
+                const response = await fetch('/api/products/listcartproducts');
+                if (response.ok) {
+                    const dbCart = await response.json();
+                    console.log('Loaded cart from DB:', dbCart);
+                    setCart(dbCart);
+                }
+            } else {
+                // Nếu user chưa login, lấy từ localStorage
+                const localCart = cartService.getCart();
+                console.log('Loaded cart from localStorage:', localCart);
+                setCart(localCart);
+            }
+        } catch (error) {
+            console.error('Error loading cart:', error);
+            setCart(cartService.getCart());
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const refreshCart = async () => {
+        if (session?.user?.email) {
             try {
-                setIsLoading(true);
-                if (session?.user?.email) {
-                    // Nếu user đã login
-                    const localCart = cartService.getCart();
-
-                    // Nếu có sản phẩm trong localStorage, thêm vào DB
-                    if (localCart.items.length > 0) {
-                        for (const item of localCart.items) {
-                            await fetch('/api/products/addtocart', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(item),
-                            });
-                        }
-                        // Xóa localStorage sau khi đã thêm vào DB
-                        cartService.clearCart();
-                    }
-
-                    // Lấy cart từ database
-                    const response = await fetch('/api/products/listcartproducts');
-                    if (response.ok) {
-                        const dbCart = await response.json();
-                        console.log('Loaded cart from DB:', dbCart);
-                        setCart(dbCart);
-                    }
-                } else {
-                    // Nếu user chưa login, lấy từ localStorage
-                    const localCart = cartService.getCart();
-                    console.log('Loaded cart from localStorage:', localCart);
-                    setCart(localCart);
+                const response = await fetch('/api/products/listcartproducts');
+                if (response.ok) {
+                    const dbCart = await response.json();
+                    console.log('Refreshed cart from DB:', dbCart);
+                    setCart(dbCart);
                 }
             } catch (error) {
-                console.error('Error loading cart:', error);
-                setCart(cartService.getCart());
-            } finally {
-                setIsLoading(false);
+                console.error('Error refreshing cart:', error);
             }
-        };
+        }
+    };
 
+    useEffect(() => {
         loadCart();
     }, [session]);
 
@@ -202,6 +218,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 updateCartItem,
                 removeFromCart,
                 clearCart,
+                refreshCart,
                 isLoading,
             }}
         >

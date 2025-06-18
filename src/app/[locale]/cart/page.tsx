@@ -8,7 +8,7 @@ import { useCart } from '@/contexts/CartContext';
 import { CartItem as CartItemType } from '@/types/global';
 
 export default function CartPage() {
-    const { cart, updateCartItem, removeFromCart } = useCart();
+    const { cart, removeFromCart } = useCart();
     const router = useRouter();
 
     const handleCheckout = () => {
@@ -66,11 +66,8 @@ export default function CartPage() {
                             <CartItem
                                 key={item._id}
                                 product={item}
-                                onQuantityChange={(qty) => {
-                                    // Chỉ cho phép thay đổi số lượng nếu không phải blindboxProduct
-                                    if (!isBlindboxProduct) {
-                                        updateCartItem(productId, itemType, qty);
-                                    }
+                                onQuantityChange={() => {
+                                    // Hàm này không còn được sử dụng vì CartItem tự xử lý với local state
                                 }}
                                 onRemove={() => {
                                     // Chỉ cho phép xóa nếu không phải blindboxProduct
