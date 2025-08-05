@@ -38,6 +38,18 @@ const OrderSchema = new mongoose.Schema(
     isPaid: { type: Boolean, default: false },
     paidAt: Date,
 
+    // Thông tin thanh toán VNPay
+    vnpayInfo: {
+      transactionId: String, // Mã giao dịch VNPay
+      bankCode: String, // Mã ngân hàng
+      bankTranNo: String, // Mã giao dịch ngân hàng
+      cardType: String, // Loại thẻ
+      responseCode: String, // Mã phản hồi
+      transactionStatus: String, // Trạng thái giao dịch
+      txnRef: String, // Mã tham chiếu giao dịch
+      payDate: Date, // Ngày thanh toán
+    },
+
     // Trạng thái vận chuyển
     shippingProvider: {
       type: String,
